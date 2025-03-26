@@ -1,0 +1,107 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="text-center mb-4">
+               
+                <h3>@ViewData["Title"]</h3>
+            </div>
+
+            <form id="account" method="post">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Đăng nhập vào tài khoản của bạn</h5>
+                        <hr />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email" class="form-label">Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3 position-relative">
+                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Mật khẩu" id="password" type="password" />
+                            <label asp-for="Input.Password" class="form-label">Mật khẩu</label>
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+                            <!-- Biểu tượng mắt -->
+                            <i class="bi bi-eye-slash position-absolute" id="togglePassword" style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"></i>
+                        </div>
+
+                        <div class="mb-3 d-flex justify-content-between">
+                            <label asp-for="Input.RememberMe" class="form-check-label">
+                                <input class="form-check-input" asp-for="Input.RememberMe" />
+                                Ghi nhớ
+                            </label>
+                            <a href="@Url.Page("./ForgotPassword")" class="small">Quên mật khẩu?</a>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button id="login-submit" type="submit" class="btn btn-primary btn-lg">Đăng nhập</button>
+                        </div>
+
+                        <div class="text-center">
+                            <p>Chưa có tài khoản? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Đăng ký ngay</a></p>
+                            <p>
+                                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Gửi lại xác nhận email</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            @* <div class="text-center mt-4"> *@
+            @*     <p>Hoặc đăng nhập qua các dịch vụ khác:</p> *@
+            @*     <div> *@
+            @*         @if ((Model.ExternalLogins?.Count ?? 0) == 0) *@
+            @*         { *@
+            @*             <div> *@
+            @*                 <p> *@
+            @*                     Không có dịch vụ xác thực ngoài nào được cấu hình. Bạn có thể xem <a href="https://go.microsoft.com/fwlink/?LinkID=532715">hướng dẫn cài đặt dịch vụ xác thực</a> để hỗ trợ đăng nhập. *@
+            @*                 </p> *@
+            @*             </div> *@
+            @*         } *@
+            @*         else *@
+            @*         { *@
+            @*             <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal"> *@
+            @*                 <div> *@
+            @*                     <p> *@
+            @*                         @foreach (var provider in Model.ExternalLogins!) *@
+            @*                         { *@
+            @*                             <button type="submit" class="btn btn-outline-primary w-100 mb-2" name="provider" value="@provider.Name" title="Đăng nhập qua tài khoản @provider.DisplayName">@provider.DisplayName</button> *@
+            @*                         } *@
+            @*                     </p> *@
+            @*                 </div> *@
+            @*             </form> *@
+            @*         } *@
+            @*     </div> *@
+            @* </div> *@
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            // Chuyển đổi trạng thái của mật khẩu
+            const type = passwordField.type === 'password' ? 'text' : 'password';
+            passwordField.type = type;
+
+            // Chuyển đổi biểu tượng mắt
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    </script>
+}

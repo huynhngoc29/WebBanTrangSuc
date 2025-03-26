@@ -1,0 +1,126 @@
+﻿@model WebBanTrangSuc.Models.ShoppingCart
+
+@{
+    ViewData["Title"] = "Giỏ Hàng";
+}
+
+<!-- Bootstrap & Google Fonts -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Custom CSS -->
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    h2 {
+        font-weight: 600;
+        color: #ee4d2d;
+    }
+
+    .table {
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .table th, .table td {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .table td {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .table .btn {
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        .table .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+
+            .table .btn-danger:hover {
+                background-color: #c82333;
+            }
+
+        .table .btn-info {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+        }
+
+            .table .btn-info:hover {
+                background-color: #138496;
+            }
+
+    .cart-footer {
+        font-weight: bold;
+        font-size: 18px;
+        color: #ee4d2d;
+    }
+
+        .cart-footer .total {
+            font-size: 20px;
+            color: #333;
+        }
+</style>
+
+<div class="container mt-4">
+    <h2>Giỏ Hàng</h2>
+
+    <!-- Giỏ hàng -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tên Sản Phẩm</th>
+                <th>Giá</th>
+                <th>Số Lượng</th>
+                <th>Tổng</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Product.Price ₫</td>
+                    <td>@item.Quantity</td>
+                    <td>@(item.Quantity * item.Product.Price) ₫</td>
+                    <td>
+                        <a href="@Url.Action("RemoveFromCart", "ShoppingCart", new { productId = item.ProductId })" class="btn btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Tổng tiền -->
+    <div class="cart-footer d-flex justify-content-between">
+        <span class="total">Tổng Tiền: @Model.Items.Sum(i => i.Quantity * i.Product.Price) ₫</span>
+        <a href="/Checkout" class="btn btn-info">Đi đến Thanh Toán</a>
+    </div>
+    <!-- Nút quay lại trang sản phẩm -->
+    <div class="mt-3">
+        <a href="@Url.Action("Index", "Product")" class="back-to-products">Quay lại trang sản phẩm</a>
+    </div>
+</div>
+
+@* <!-- Bootstrap JS --> *@
+@* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> *@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<WebBanTrangSuc.Models.Category>
+
+<h2>Danh mục sản phẩm</h2>
+
+<p>
+    <a asp-action="Add" class="btn btn-success">➕ Thêm danh mục</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên Danh Mục</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger">🗑 Xóa</a>
+                    <a asp-action="Update" asp-route-id="@category.Id" class="btn btn-warning">✏ Cập nhật</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,18 @@
+﻿@model WebBanTrangSuc.Models.Product
+
+<h2>Bạn có chắc chắn xóa sản phẩm này không?</h2>
+
+<div>
+    <h4>Name: @Model.Name</h4>
+    <h4>Price: @Model.Price.ToString("C0")</h4> <!-- Định dạng lại giá -->
+    <h4>Description: @Model.Description</h4>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <!-- Đảm bảo Id được truyền trong hidden field -->
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    |
+    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Cancel</a>
+</form>
