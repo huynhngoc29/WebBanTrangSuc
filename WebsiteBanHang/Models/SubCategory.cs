@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 namespace WebBanTrangSuc.Models
 {
-    public class Category
+    public class SubCategory
     {
         public int Id { get; set; }
         [Required]
