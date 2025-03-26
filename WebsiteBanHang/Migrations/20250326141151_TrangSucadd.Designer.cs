@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBanTrangSuc.Models;
 
@@ -11,9 +12,11 @@ using WebBanTrangSuc.Models;
 namespace WebBanTrangSuc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326141151_TrangSucadd")]
+    partial class TrangSucadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,29 +276,6 @@ namespace WebBanTrangSuc.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("WebBanTrangSuc.Models.CategorySubCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("SubCategoryId");
-
-                    b.ToTable("CategorySubCategory");
-                });
-
             modelBuilder.Entity("WebBanTrangSuc.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -322,14 +302,9 @@ namespace WebBanTrangSuc.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("SubCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("SubCategoryId");
 
                     b.ToTable("Products");
                 });
@@ -371,23 +346,6 @@ namespace WebBanTrangSuc.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ShoppingCarts");
-                });
-
-            modelBuilder.Entity("WebBanTrangSuc.Models.SubCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SubCategory");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -456,25 +414,6 @@ namespace WebBanTrangSuc.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("WebBanTrangSuc.Models.CategorySubCategory", b =>
-                {
-                    b.HasOne("WebBanTrangSuc.Models.Category", "Category")
-                        .WithMany("CategorySubCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebBanTrangSuc.Models.SubCategory", "SubCategory")
-                        .WithMany("CategorySubCategories")
-                        .HasForeignKey("SubCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("SubCategory");
-                });
-
             modelBuilder.Entity("WebBanTrangSuc.Models.Product", b =>
                 {
                     b.HasOne("WebBanTrangSuc.Models.Category", "Category")
@@ -483,15 +422,7 @@ namespace WebBanTrangSuc.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebBanTrangSuc.Models.SubCategory", "SubCategory")
-                        .WithMany("Products")
-                        .HasForeignKey("SubCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("SubCategory");
                 });
 
             modelBuilder.Entity("WebBanTrangSuc.Models.ProductImage", b =>
@@ -507,8 +438,6 @@ namespace WebBanTrangSuc.Migrations
 
             modelBuilder.Entity("WebBanTrangSuc.Models.Category", b =>
                 {
-                    b.Navigation("CategorySubCategories");
-
                     b.Navigation("Products");
                 });
 
@@ -520,13 +449,6 @@ namespace WebBanTrangSuc.Migrations
             modelBuilder.Entity("WebBanTrangSuc.Models.ShoppingCart", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("WebBanTrangSuc.Models.SubCategory", b =>
-                {
-                    b.Navigation("CategorySubCategories");
-
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
