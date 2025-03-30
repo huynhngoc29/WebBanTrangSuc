@@ -1,6 +1,79 @@
 ﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
+/* Giảm chiều cao của header */
+header {
+    padding-top: 10px; /* Giảm khoảng cách trên của header */
+    padding-bottom: 10px; /* Giảm khoảng cách dưới của header */
+    background-color: white; /* Đảm bảo nền trắng */
+}
+.container-fluid {
+    background-color: white;
+    padding: 10px 0 0;
+}
+.container {
+    background-color: white;
+    padding: 0 0 10px;
+}
+    .navbar .form-control {
+        border-radius: 50px; /* Tạo hiệu ứng tròn cho ô tìm kiếm */
+        padding-left: 20px; /* Thêm padding bên trái */
+        width: 500px;
+    }
 
+    /* Tùy chỉnh màu nền của thanh tìm kiếm */
+    .navbar .form-control:focus {
+        border-color: #f5a623; /* Thêm màu sắc khi focus vào thanh tìm kiếm */
+        box-shadow: none;
+    }
+
+/* Chỉnh sửa khoảng cách trong navbar */
+.navbar {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    max-height: 100px; /* Giảm chiều cao của navbar */
+}
+    /* Giảm kích thước logo */
+    .navbar .navbar-brand img {
+        width: 200px; /* Giảm kích thước logo một chút */
+        height: auto;
+        object-fit: contain;
+    }
+
+
+
+.navbar-nav {
+    display: flex;
+    justify-content: space-between; /* Căn giữa các mục menu */
+    align-items: center; /* Căn chỉnh các mục theo chiều dọc */
+    flex-wrap: wrap; /* Cho phép menu linh hoạt khi thu nhỏ màn hình */
+    text-align: center
+}
+
+    .navbar-nav .nav-item {
+        margin-right: 20px; /* Cách đều các mục trong menu */
+    }
+
+
+.nav-item .dropdown-menu {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15); /* Bóng cho menu dropdown */
+    border: 1px solid #ddd; /* Đường viền nhẹ */
+}
+
+.nav-item .dropdown-item:hover {
+    background-color: #f8f9fa; /* Màu nền khi hover vào item trong dropdown */
+}
+
+.navbar-toggler {
+    border: none; /* Ẩn viền khi sử dụng menu ở mobile */
+}
+
+/* Điều chỉnh menu trên màn hình nhỏ */
+@media (max-width: 992px) {
+    .navbar-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -46,3 +119,29 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+.footer-link {
+    color: #f8f9fa;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+    .footer-link:hover {
+        color: #0d6efd;
+    }
+
+.social-icon {
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    color: #fff;
+    display: inline-block;
+    margin: 0 8px;
+    transition: all 0.3s ease;
+}
+
+    .social-icon:hover {
+        transform: translateY(-3px);
+        color: #fff;
+    }
