@@ -1,18 +1,38 @@
 ﻿@model WebBanTrangSuc.Models.Product
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
 
-<h2>Bạn có chắc chắn xóa sản phẩm này không?</h2>
+<h2>Bạn có chắc chắn xóa sản phẩm?</h2>
 
-<div>
-    <h4>Name: @Model.Name</h4>
-    <h4>Price: @Model.Price.ToString("C0")</h4> <!-- Định dạng lại giá -->
-    <h4>Description: @Model.Description</h4>
+<div class="container mt-4 flex justify-content-center">
+    <div class="row w-100">
+        <!-- Cột Hình Ảnh -->
+        <div class="col-md-5 d-flex justify-content-center align-items-start">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="img-fluid rounded" alt="Product Image"
+                     style="max-width: 80%; height: auto; object-fit: contain;">
+            }
+            else
+            {
+                <p class="text-muted">No Image Available</p>
+            }
+        </div>
+
+        <!-- Cột Thông Tin -->
+        <div class="col-md-7 d-flex justify-content-center align-items-start">
+            <div class="card-body">
+                <h4 class="card-title fw-bold">@Model.Name</h4>
+                <h4 class="text-danger fw-bold">Price: @Model.Price.ToString("N0") VND</h4>
+                <p class="card-text"><strong>Description:</strong> @Model.Description</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <form asp-action="DeleteConfirmed" method="post">
-    <!-- Đảm bảo Id được truyền trong hidden field -->
     <input type="hidden" asp-for="Id" />
-
-    <button type="submit" class="btn btn-danger">Delete</button>
-    |
-    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger">Delete</button> |
+    <a href="/Admin/Product" class="btn btn-secondary">Cancel</a> <!-- Nút Cancel trở lại trang quản lý sản phẩm -->
 </form>

@@ -1,0 +1,45 @@
+﻿@model List<WebBanTrangSuc.Models.Promotion>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    ViewData["Title"] = "Khuyến Mãi";
+}
+
+<h2 class="mb-4">Khuyến Mãi</h2>
+<div class="dropdown mt-3">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownTest" data-bs-toggle="dropdown" aria-expanded="false">
+        Dropdown Test
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownTest">
+        <li><a class="dropdown-item" href="#">Test 1</a></li>
+        <li><a class="dropdown-item" href="#">Test 2</a></li>
+    </ul>
+</div>
+
+<div class="row">
+    @foreach (var promo in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                @if (!string.IsNullOrEmpty(promo.ImageUrl))
+                {
+                    <img src="@promo.ImageUrl" class="card-img-top" alt="@promo.Title" />
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@promo.Title</h5>
+                    <p class="card-text">@promo.Description</p>
+                    @if (promo.StartDate != null && promo.EndDate != null)
+                    {
+                        <p class="text-muted small">
+                            Từ @promo.StartDate.Value.ToShortDateString() đến @promo.EndDate.Value.ToShortDateString()
+                        </p>
+                    }
+                </div>
+            </div>
+
+        </div>
+    }
+</div>

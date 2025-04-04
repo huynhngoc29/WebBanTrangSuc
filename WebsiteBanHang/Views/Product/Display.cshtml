@@ -1,106 +1,86 @@
 ﻿@model WebBanTrangSuc.Models.Product
 
-@{
-    ViewData["Title"] = "Product Details";
-}
+<a asp-action="Index" class="btn btn-link"><i class="fa fa-arrow-left"></i> Back to List</a>
 
-<!-- Bootstrap & Google Fonts -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<div class="container mt-4 flex justify-content-center">
+    <div class="row w-100">
+        <!-- Cột Hình Ảnh -->
+        <div class="col-md-5 d-flex justify-content-center align-items-start">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="img-fluid rounded" alt="Product Image"
+                     style="max-width: 80%; height: auto; object-fit: contain;">
+            }
+            else
+            {
+                <p class="text-muted">No Image Available</p>
+            }
+        </div>
 
-<!-- Tùy chỉnh CSS -->
+        <!-- Cột Thông Tin (Căn lên trên cùng) -->
+        <div class="col-md-7 d-flex justify-content-center align-items-start">
+            <div class="card-body">
+                <h2 class="card-title fw-bold">@Model.Name</h2>
+                <h4 class="text-danger fw-bold">Price: @Model.Price.ToString("N0") VND</h4>
+                <p class="card-text"><strong>Description:</strong> @Model.Description</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Đặt phần "Sản phẩm tương tự" dưới phần thông tin sản phẩm -->
+    <h3 class="fw-bold mt-5">Sản Phẩm Tương Tự</h3>
+    <div class="row mt-2">
+        @foreach (var similarProduct in ViewBag.SimilarProducts as List<WebBanTrangSuc.Models.Product>)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card product-card h-100 shadow-sm">
+                    <!-- Hình ảnh sản phẩm -->
+                    <div class="position-relative overflow-hidden">
+                        <img src="@similarProduct.ImageUrl" class="card-img-top product-img"
+                             alt="Product Image">
+                    </div>
+
+                    <!-- Nội dung sản phẩm -->
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@similarProduct.Name</h5>
+                        <p class="text-primary fw-bold">@similarProduct.Price.ToString("N0") VND</p>
+                        <p class="card-text text-muted">@similarProduct.Description</p>
+                    </div>
+
+                    <!-- Nút Action -->
+                    <div class="card-footer text-center">
+                        <a asp-action="Display" asp-route-id="@similarProduct.Id" class="btn btn-outline-info btn-sm">Xem</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
 <style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f8f9fa;
-    }
-
-    .details-container {
-        max-width: 700px;
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-        font-weight: 600;
-        color: #ee4d2d;
-    }
-
-    .product-img {
-        max-width: 100%;
-        border-radius: 5px;
+    .product-card {
         transition: transform 0.3s ease-in-out;
     }
 
-        .product-img:hover {
+        .product-card:hover {
             transform: scale(1.05);
         }
 
-    .additional-img {
-        width: 100px;
-        height: auto;
-        margin: 5px;
-        border-radius: 5px;
+    .product-img {
+        height: 250px;
+        width: 100%;
+        object-fit: contain;
+        padding: 10px;
         transition: transform 0.3s ease-in-out;
     }
 
-        .additional-img:hover {
-            transform: scale(1.1);
-        }
-
-    .btn-primary {
-        background-color: #ee4d2d;
-        border: none;
-    }
-
-        .btn-primary:hover {
-            background-color: #d84315;
-        }
-
-    .btn-secondary {
-        background-color: #6c757d;
+    .product-card:hover .product-img {
+        transform: scale(1.1);
     }
 </style>
 
-<!-- Container chính -->
-<div class="container d-flex justify-content-center mt-4">
-    <div class="details-container">
-        <h2 class="mb-4 text-center">📌 Product Details</h2>
 
-        <div class="text-center">
-            <!-- Hiển thị ảnh chính -->
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="mb-3">
-                    <img src="@Model.ImageUrl" class="product-img" alt="Product Image">
-                </div>
-            }
 
-            <!-- Hiển thị danh sách ảnh phụ -->
-            @if (Model.ImageUrls != null && Model.ImageUrls.Any())
-            {
-                <div class="mb-3">
-                    <h5>📷 Additional Images:</h5>
-                    @foreach (var imageUrl in Model.ImageUrls)
-                    {
-                        <img src="@imageUrl" class="additional-img" alt="Additional Image">
-                    }
-                </div>
-            }
-        </div>
 
-        <div>
-            <h4>📌 Name: <span class="fw-bold">@Model.Name</span></h4>
-            <h4>💰 Price: <span class="text-danger fw-bold">@Model.Price.ToString("N0") $</span></h4>
-            <h4>📝 Description:</h4>
-            <p>@Model.Description</p>
-        </div>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a asp-action="Index" class="btn btn-secondary">⬅ Back to List</a>
-            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">✏ Edit Product</a>
-        </div>
-    </div>
-</div>

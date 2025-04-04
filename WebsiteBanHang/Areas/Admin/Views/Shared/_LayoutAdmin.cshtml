@@ -1,0 +1,142 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Identity
+@using WebBanTrangSuc.Models // đổi thành namespace chứa ApplicationUser
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Quản trị Purple Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="../../LayoutAdmin/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="../../LayoutAdmin/assets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="../../LayoutAdmin/assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="../../LayoutAdmin/assets/images/favicon.ico" />
+
+    <!-- Đảm bảo jQuery được tải trước jQuery Cookie Plugin -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Thêm jQuery Cookie plugin sau jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+</head>
+<body>
+    <div class="container-scroller">
+        <!-- Thanh điều hướng -->
+        <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                <a class="navbar-brand brand-logo" href="../../index.html"><img src="../../LayoutAdmin/assets/images/logo.svg" alt="logo" /></a>
+                <a class="navbar-brand brand-logo-mini" href="../../index.html"><img src="../../LayoutAdmin/assets/images/logo-mini.svg" alt="logo" /></a>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-stretch">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="mdi mdi-menu"></span>
+                </button>
+                <ul class="navbar-nav navbar-nav-right">
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="nav-profile-text">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <p class="mb-1 text-black">@UserManager.GetUserName(User)</p>
+                                }
+                            </div>
+                        </a>
+                        <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
+                            <form method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home")" id="logoutForm">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="mdi mdi-logout me-2 text-primary"></i> Đăng xuất
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="mdi mdi-menu"></span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="container-fluid page-body-wrapper">
+            <!-- Thanh bên -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">
+                            <span class="menu-title">Trang chủ</span>
+                            <i class="mdi mdi-home menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="admin" asp-controller="Admin" asp-action="Products">
+                            <span class="menu-title">Quản lý sản phẩm</span>
+                            <i class="mdi mdi-crosshairs-gps menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="admin" asp-controller="Category" asp-action="Index">
+                            <span class="menu-title">Quản lý danh mục</span>
+                            <i class="mdi mdi-folder menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="admin" asp-controller="Category" asp-action="Index">
+                            <span class="menu-title">Quản lý đơn hàng</span>
+                            <i class="mdi mdi-folder menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../pages/forms/basic_elements.html">
+                            <span class="menu-title">Biểu mẫu</span>
+                            <i class="mdi mdi-format-list-bulleted menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../pages/charts/chartjs.html">
+                            <span class="menu-title">Biểu đồ</span>
+                            <i class="mdi mdi-chart-bar menu-icon"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../pages/tables/basic-table.html">
+                            <span class="menu-title">Bảng</span>
+                            <i class="mdi mdi-table-large menu-icon"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    @RenderBody()
+                </div>
+
+                <footer class="footer">
+                    <div class="container-fluid d-flex justify-content-between">
+                        <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Bản quyền © bootstrapdash.com 2021</span>
+                        <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"> Mẫu quản trị miễn phí từ <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrapdash.com</a></span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- plugins:js -->
+    <script src="../../LayoutAdmin/assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../LayoutAdmin/assets/js/off-canvas.js"></script>
+    <script src="../../LayoutAdmin/assets/js/hoverable-collapse.js"></script>
+    <script src="../../LayoutAdmin/assets/js/misc.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
