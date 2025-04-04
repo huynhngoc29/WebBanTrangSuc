@@ -1,0 +1,42 @@
+﻿@model List<WebBanTrangSuc.Models.Category>
+
+<ul class="navbar-nav mx-auto">
+    @foreach (var category in Model)
+    {
+        var subCategories = category.CategorySubCategories?
+        .Where(cs => cs.SubCategory != null)
+        .Select(cs => cs.SubCategory)
+        .Distinct()
+        .ToList();
+
+        if (subCategories != null && subCategories.Any())
+        {
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    @category.Name
+                </a>
+                <ul class="dropdown-menu">
+                    @foreach (var sub in subCategories)
+                    {
+                        <li><a class="dropdown-item" href="#">@sub.Name</a></li>
+                    }
+                </ul>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="#">@category.Name</a>
+            </li>
+        }
+    }
+
+    <!-- Khuyến mãi -->
+    <li class="nav-item">
+        <a class="nav-link @(string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Promotion", StringComparison.OrdinalIgnoreCase) ? "text-danger fw-bold" : "")"
+           asp-controller="Promotion" asp-action="Index">
+            Khuyến Mãi
+        </a>
+    </li>
+</ul>

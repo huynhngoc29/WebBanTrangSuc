@@ -18,6 +18,15 @@ namespace WebBanTrangSuc.Repositories
                 .Include(p => p.Category)
                 .ToListAsync();
         }
+        // Repository: EFProductRepository
+        public async Task<IEnumerable<Product>> GetFlashSaleProductsAsync()
+        {
+            // Lọc các sản phẩm có giảm giá (IsOnSale = true) và DiscountPercentage > 0
+            return await _context.Products
+                .Where(p => p.IsOnSale && p.DiscountPercentage > 0)
+                .ToListAsync();
+        }
+
 
         public async Task<Product> GetByIdAsync(int id)
         {

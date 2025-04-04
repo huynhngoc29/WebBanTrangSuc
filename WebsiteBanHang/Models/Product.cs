@@ -23,5 +23,8 @@ namespace WebBanTrangSuc.Models
         public SubCategory? SubCategory { get; set; }
         public string? ImageUrl { get; set; }
         public List<ProductImage>? ImageUrls { get; set; }
+        // Mặc định là không có giảm giá (0%) và không nằm trong chương trình giảm giá
+        public decimal DiscountPercentage { get; set; } = 0; // Không giảm giá
+        public bool IsOnSale { get; set; } = false;  // Không giảm giá
     }
 }

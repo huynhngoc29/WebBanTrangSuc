@@ -2,8 +2,24 @@
 {
     public class ShoppingCart
     {
-        public int Id { get; set; }  // Thêm khóa chính cho ShoppingCart
-        public string UserId { get; set; }  // Id của người dùng
-        public List<ShoppingCartItem> Items { get; set; } = new List<ShoppingCartItem>();  // Danh sách các mặt hàng trong giỏ hàng
+        public List<CartItem> Items { get; set; } = new List<CartItem>();
+
+        public void AddItem(CartItem item)
+        {
+            var existingItem = Items.FirstOrDefault(i => i.ProductId == item.ProductId);
+            if (existingItem != null)
+            {
+                existingItem.Quantity += item.Quantity;
+            }
+            else
+            {
+                Items.Add(item);
+            }
+        }
+
+        public void RemoveItem(int productId)
+        {
+            Items.RemoveAll(i => i.ProductId == productId);
+        }
     }
 }
