@@ -50,6 +50,37 @@
     top: 0;
     text-align: center;
     }
+
+    .card:hover {
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+    }
+
+    .card-img-top {
+        padding: 10px;
+    }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .flash-sale-link {
+        font-size: 20px;              /* 👈 nhỏ hơn nữa */
+        font-weight: 500;             /* vừa phải, không quá dày */
+        margin-top: 4px;
+        display: inline-block;
+        line-height: 1;
+    }
+
+    .flash-sale-link:hover {
+        text-decoration: underline;
+        color: #dc3545; /* đỏ nhẹ */
+    }
+
+
+    
 </style>
 <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-inner">
@@ -74,133 +105,119 @@
 </div>
 
 
-.<div class="FlashSale" style="padding-left: 5%; padding-right: 5%">
-    <div class="FlashSaleTitle">
-        <img src="https://theme.hstatic.net/200000274839/1000946002/14/flash-sale.png?v=76" class="card-img-top" alt="..." style="width: 200px" height="70px">
-              
-    </div>
-    <div class="ProductSale" style="display: flex; justify-content: space-between;">
-        <div class="card" style="width: 18rem;">
-            <div class="sale-label">18% GIẢM</div>
-            <img src="http://cdn.pnj.io/images/thumbnails/485/485/detailed/31/smxmxmk000066-mat-day-chuyen-bac-dinh-da-pnjsilver-2.png" class="card-img-top" alt="...">
-              <div class="card-body">
-                <h5 class="card-title">Mặt dây chuyền bạc đính đá màu xanh</h5>
-                <div class="d-flex justify-content-between">
-                    <p class="card-price" style="font-weight: bold; color: #e74c3c;">26,190 đ</p>
-                    <p class="card-price-old" style="text-decoration: line-through; color: #7f8c8d;">32,000 đ</p>
-                </div>
-                
-                <p class="sold-status" style="color: #e74c3c; font-weight: bold; margin-top: 10px;">🔥 Đã bán 21 sản phẩm</p>
+<!-- FLASH SALE -->
+<h2 class="fw-bold text-danger d-flex align-items-center">
+    <span style="font-size: 28px;">⚡FLASH SALE</span>
+    <span id="flash-sale-timer" class="ms-3 badge bg-dark text-white" style="font-size: 18px;">
+        02 : 00 : 00
+    </span>
+   
 
-            </div>
-        </div> <div class="card" style="width: 18rem;">
-            <div class="sale-label">18% GIẢM</div>
-            <img src="http://cdn.pnj.io/images/thumbnails/485/485/detailed/31/gnxmxmw000093-nhan-vang-trang-10k-dinh-da-ecz-swarovski-pnj.png" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Nhẫn Vàng trắng 10K</h5>
-                <div class="d-flex justify-content-between">
-                    <p class="card-price" style="font-weight: bold; color: #e74c3c;">26,190 đ</p>
-                    <p class="card-price-old" style="text-decoration: line-through; color: #7f8c8d;">32,000 đ</p>
+    <a href="@Url.Action("FlashSale", "Product")"
+       class="btn btn-outline-primary btn-sm">
+        Xem tất cả &gt;
+    </a>
+
+</h2>
+
+<div class="row">
+    @foreach (var item in Model.FlashSaleProducts)
+    {
+        var discountedPrice = item.Price * (1 - item.DiscountPercentage / 100);
+        var remaining = item.Quantity <= 5 ? $"🔥 CHỈ CÒN {item.Quantity}" : "ĐANG BÁN CHẠY";
+
+        <div class="col-md-2 mb-4">
+            <div class="card shadow-sm text-center border-0 position-relative">
+
+                <!-- % giảm giá -->
+                <span class="position-absolute top-0 end-0 badge bg-warning text-dark">
+                    ⚡ -@((int)item.DiscountPercentage)%
+
+                </span>
+                <a asp-controller="Product" asp-action="Display" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+
+                    <!-- ảnh + tên sản phẩm -->
+               
+
+                <!-- Ảnh -->
+                <img src="@item.ImageUrl" class="card-img-top" style="height: 150px; object-fit: contain;" alt="@item.Name" />
+
+                <div class="card-body p-2">
+                    <div class="text-muted small">4.4 ★</div>
+
+                    <h6 class="card-title mt-1 mb-2 text-truncate">@item.Name</h6>
+
+                    <p class="fw-bold text-danger mb-2">@String.Format("{0:N0}₫", discountedPrice)</p>
+
+                    <!-- Nút trạng thái -->
+                    <span class="badge" style="background: linear-gradient(to right, orange, red); color: white; font-size: 13px;">
+                        @remaining
+                    </span>
                 </div>
-                <p class="sold-status" style="color: #e74c3c; font-weight: bold; margin-top: 10px;">🔥 Đã bán 21 sản phẩm</p>
+                </a>
             </div>
         </div>
-        <div class="card" style="width: 18rem;">
-            <div class="sale-label">18% GIẢM</div>
-            <img src="http://cdn.pnj.io/images/thumbnails/485/485/detailed/49/wdf16d00446.000-t033.210.16.053.00-dong-ho-thoi-trang-nu-day-da-tissot-1.png" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Đồng Hồ Tissot Nữ</h5>
-                <div class="d-flex justify-content-between">
-                    <p class="card-price" style="font-weight: bold; color: #e74c3c;">26,190 đ</p>
-                    <p class="card-price-old" style="text-decoration: line-through; color: #7f8c8d;">32,000 đ</p>
-                </div>
-                <p class="sold-status" style="color: #e74c3c; font-weight: bold; margin-top: 10px;">🔥 Đã bán 21 sản phẩm</p>
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <div class="sale-label">18% GIẢM</div>
-            <img src="http://cdn.pnj.io/images/thumbnails/485/485/detailed/31/sbxm00k000101-bong-tai-bac-pnjsilver-hinh-trai-tim.png" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Bông tai bạc đính đá</h5>
-                <div class="d-flex justify-content-between">
-                    <p class="card-price" style="font-weight: bold; color: #e74c3c;">26,190 đ</p>
-                    <p class="card-price-old" style="text-decoration: line-through; color: #7f8c8d;">32,000 đ</p>
-                </div>
-                <p class="sold-status" style="color: #e74c3c; font-weight: bold; margin-top: 10px;">🔥 Đã bán 21 sản phẩm</p>
-            </div>
-        </div>
-    </div>
+    }
 </div>
 
 
-.<div class="NewProduct" style="padding-left: 5%; padding-right: 5%">
-    <div class="NewProductTitle">
-        @* <img src="" class="card-img-top" alt="..." style="width: 200px" height="70px"> *@
-		<h2>Sản phẩm mới</h2>
-
-    </div>
-    <div class="NewProductSale content-product-list" style="display: grid; grid-template-columns: repeat(4, 1fr); justify-content: space-between;">
-        <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div> <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div> <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div>
-        <div class="card" style="width: 18rem;">
-            <img src="https://product.hstatic.net/200000274839/product/z6353608963880_e1ba510eddbc51516845a7fa82123cf8_9ae69f66eac1458480ddca3215e79785_large.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-
-            </div>
-        </div>
-    </div>
+<!-- SẢN PHẨM MỚI -->
+<h2 class="mt-5 fw-bold">🆕 Sản phẩm mới</h2>
+<div class="text-end mt-3">
+    <a href="@Url.Action("NewProducts", "Product")" class="btn btn-outline-primary btn-sm">
+        Xem thêm &gt;
+    </a>
 </div>
+
+<div class="row">
+    @foreach (var item in Model.NewProducts)
+    {
+        <div class="col-md-2 mb-4">
+            <div class="card shadow-sm text-center border-0 position-relative">
+                <a asp-controller="Product" asp-action="Display" asp-route-id="@item.Id" class="text-decoration-none text-dark">
+                    <img src="@item.ImageUrl" class="card-img-top" style="height: 150px; object-fit: contain;" alt="@item.Name" />
+
+                    <div class="card-body p-2">
+                        <div class="text-muted small">4.4 ★</div>
+
+                        <h6 class="card-title mt-1 mb-2 text-truncate">@item.Name</h6>
+
+                        <p class="fw-bold text-danger mb-2">
+                            @String.Format("{0:N0}₫", item.Price)
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    function startCountdown(durationInSeconds, elementId) {
+        let timer = durationInSeconds;
+        const display = document.getElementById(elementId);
+
+        const countdownInterval = setInterval(function () {
+            let hours = Math.floor(timer / 3600);
+            let minutes = Math.floor((timer % 3600) / 60);
+            let seconds = timer % 60;
+
+            display.textContent =
+                `${hours.toString().padStart(2, '0')} : ` +
+                `${minutes.toString().padStart(2, '0')} : ` +
+                `${seconds.toString().padStart(2, '0')}`;
+
+            timer--;
+
+            if (timer < 0) {
+                // Reset lại về 2 tiếng
+                timer = durationInSeconds;
+            }
+        }, 1000);
+    }
+
+    // Khi trang tải xong, bắt đầu đếm ngược
+    window.onload = function () {
+        // 2 tiếng = 7200 giây
+        startCountdown(7200, "flash-sale-timer");
+    };
+</script>

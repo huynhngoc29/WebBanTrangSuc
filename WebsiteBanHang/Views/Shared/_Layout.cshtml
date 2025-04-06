@@ -29,9 +29,13 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 @* thanh tim kiem *@
-                <form class="d-flex mx-auto" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Bạn tìm gì..." aria-label="Search" style="border-radius: 50px;">
+                <form asp-controller="Product" asp-action="Index" method="get" class="d-flex mx-auto" role="search" style="max-width: 500px;">
+                    <input name="searchTerm" class="form-control me-2" value="@ViewBag.SearchTerm" type="search" placeholder="Bạn tìm gì..." aria-label="Search" style="border-radius: 50px;">
+                    <button type="submit" class="btn btn-outline-secondary rounded-circle">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </form>
+
                 <!-- Thanh menu bên dưới logo -->
                 <!-- Các nút Giỏ hàng và Đăng nhập -->
                 <div class="d-flex">

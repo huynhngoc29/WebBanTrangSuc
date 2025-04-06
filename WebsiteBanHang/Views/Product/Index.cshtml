@@ -119,34 +119,28 @@
 
         </div>
     </section>
-
-    <form method="get" class="d-flex">
-        <!-- Dropdown lọc theo danh mục -->
+    <form method="get" asp-controller="Product" asp-action="Index" class="d-flex">
+        <!-- Dropdown danh mục -->
         <select name="categoryId" class="form-select me-2" style="width: 200px;" onchange="updateFilter()">
             <option value="">📂 Tất cả danh mục</option>
             @if (ViewBag.Categories != null)
             {
                 @foreach (var category in ViewBag.Categories)
                 {
-                    <option value="@category.Value" selected="@(ViewBag.CategoryId?.ToString() == category.Value ? "selected" : null)">
+                    <option value="@category.Value" selected="@(ViewBag.SelectedCategory?.ToString() == category.Value ? "selected" : null)">
                         @category.Text
                     </option>
                 }
             }
         </select>
 
-        <!-- Ô tìm kiếm -->
-        <input type="text" name="search" placeholder="Search product..." class="form-control search-bar me-2" value="@ViewBag.Search" />
+        @* <!-- Sửa lại tên input --> *@
+        @* <input type="text" name="searchTerm" placeholder="Bạn tìm gì..." class="form-control search-bar me-2" value="@ViewBag.SearchTerm" /> *@
 
-        <!-- Nút search -->
-        <button type="submit" class="btn btn-search">🔍 Search</button>
+        @* <!-- Nút search --> *@
+        @* <button type="submit" class="btn btn-search">🔍 Search</button> *@
     </form>
-    <!-- Bộ lọc giá -->
-    <div class="d-flex align-items-center mb-3">
-        <label class="me-2 fw-bold text-muted">Giá</label>
-        <a href="javascript:void(0);" onclick="updateSortOrder()"
-           class="sort-btn @(ViewBag.SortOrder == "asc" ? "asc" : "desc")">⬆⬇</a>
-    </div>
+
     <!-- Danh sách sản phẩm dạng GRID -->
     <section>
         <div class="row">

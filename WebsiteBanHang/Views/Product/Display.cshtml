@@ -1,73 +1,197 @@
-﻿@model WebBanTrangSuc.Models.Product
+﻿@* @model WebBanTrangSuc.Models.Product *@
+@* @using Microsoft.AspNetCore.Identity *@
+
+@* <a asp-action="Index" class="btn btn-link"><i class="fa fa-arrow-left"></i> Back to List</a> *@
+
+@* <div class="container mt-4 flex justify-content-center"> *@
+@*     <div class="row w-100"> *@
+@*         <!-- Cột Hình Ảnh --> *@
+@*         <div class="col-md-5 d-flex justify-content-center align-items-start"> *@
+@*             @if (!string.IsNullOrEmpty(Model.ImageUrl)) *@
+@*             { *@
+@*                 <img src="@Model.ImageUrl" class="img-fluid rounded" alt="Product Image" *@
+@*                      style="max-width: 80%; height: auto; object-fit: contain;"> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <p class="text-muted">No Image Available</p> *@
+@*             } *@
+@*         </div> *@
+
+@*         <!-- Cột Thông Tin (Căn lên trên cùng) --> *@
+@*         <div class="col-md-7 d-flex justify-content-center align-items-start"> *@
+@*             <div class="card-body"> *@
+@*                 <h2 class="card-title fw-bold">@Model.Name</h2> *@
+@*                 <h4 class="text-danger fw-bold">Price: @Model.Price.ToString("N0") VND</h4> *@
+@*                 <p class="card-text"><strong>Description:</strong> @Model.Description</p> *@
+@* 				<p class="card-text"><strong>Category:</strong> @Model.Category.Name</p> *@
+@* 				<p class="card-text"><strong>Quantity:</strong> @Model.Quantity</p> *@
+@*                 @if (Model.Quantity > 0) *@
+@*                 { *@
+@*                     <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@Model.Id" asp-route-quantity="1"> *@
+@*                         <button class="btn btn-outline-primary btn-sm"> *@
+@*                             <i class="bi-cart-fill me-1"></i> Mua Ngay *@
+@*                         </button> *@
+@*                     </a> *@
+@*                 } *@
+@*                 else *@
+@*                 { *@
+@*                     <span class="badge bg-danger text-white">Hết hàng</span> *@
+@*                 } *@
+
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+
+
+@*     <!-- Đặt phần "Sản phẩm tương tự" dưới phần thông tin sản phẩm --> *@
+@*     <h3 class="fw-bold mt-5">Sản Phẩm Tương Tự</h3> *@
+@*     <div class="row mt-2"> *@
+@*         @foreach (var similarProduct in ViewBag.SimilarProducts as List<WebBanTrangSuc.Models.Product>) *@
+@*         { *@
+@*             <div class="col-lg-3 col-md-4 col-sm-6 mb-4"> *@
+@*                 <div class="card product-card h-100 shadow-sm"> *@
+@*                     <!-- Hình ảnh sản phẩm --> *@
+@*                     <div class="position-relative overflow-hidden"> *@
+@*                         <img src="@similarProduct.ImageUrl" class="card-img-top product-img" *@
+@*                              alt="Product Image"> *@
+@*                     </div> *@
+
+@*                     <!-- Nội dung sản phẩm --> *@
+@*                     <div class="card-body text-center"> *@
+@*                         <h5 class="card-title">@similarProduct.Name</h5> *@
+@*                         <p class="text-primary fw-bold">@similarProduct.Price.ToString("N0") VND</p> *@
+@*                         <p class="card-text text-muted">@similarProduct.Description</p> *@
+@*                     </div> *@
+
+
+@*                     <!-- Nút Action --> *@
+@*                     <div class="card-footer text-center"> *@
+@*                         <a asp-action="Display" asp-route-id="@similarProduct.Id" class="btn btn-outline-info btn-sm">Xem</a> *@
+@*                     </div> *@
+@*                 </div> *@
+@*             </div> *@
+@*         } *@
+@*     </div> *@
+@* </div> *@
+
+@* <style> *@
+@*     .product-card { *@
+@*         transition: transform 0.3s ease-in-out; *@
+@*     } *@
+
+@*         .product-card:hover { *@
+@*             transform: scale(1.05); *@
+@*         } *@
+
+@*     .product-img { *@
+@*         height: 250px; *@
+@*         width: 100%; *@
+@*         object-fit: contain; *@
+@*         padding: 10px; *@
+@*         transition: transform 0.3s ease-in-out; *@
+@*     } *@
+
+@*     .product-card:hover .product-img { *@
+@*         transform: scale(1.1); *@
+@*     } *@
+@* </style> *@
+
+
+
+
+@model WebBanTrangSuc.Models.Product
 @using Microsoft.AspNetCore.Identity
 
-<a asp-action="Index" class="btn btn-link"><i class="fa fa-arrow-left"></i> Back to List</a>
+<a asp-action="Index" class="btn btn-link"><i class="fa fa-arrow-left"></i> Quay lại</a>
 
-<div class="container mt-4 flex justify-content-center">
-    <div class="row w-100">
-        <!-- Cột Hình Ảnh -->
-        <div class="col-md-5 d-flex justify-content-center align-items-start">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+<div class="container mt-4">
+    <div class="row">
+        <!-- Ảnh sản phẩm chính + thumbnail -->
+        <div class="col-md-5">
+            <img src="@Model.ImageUrl" class="img-fluid rounded border w-100" alt="Product Image"
+                 style="max-height: 400px; object-fit: contain;" />
+            <div class="d-flex gap-2 mt-3">
+                @if (Model.ImageUrls != null)
+                {
+                    foreach (var img in Model.ImageUrls)
+                    {
+                        <img src="@img.Url" width="60" height="60" class="rounded border" style="object-fit: contain;" />
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <div class="col-md-7">
+            <h2 class="fw-bold">@Model.Name</h2>
+            <div class="text-muted mb-2">Mã sản phẩm: #@Model.Id</div>
+
+            @{
+                var discountedPrice = Model.Price * (1 - Model.DiscountPercentage / 100);
+            }
+
+            <h4 class="text-danger fw-bold">
+                @String.Format("{0:N0}₫", discountedPrice)
+                @if (Model.DiscountPercentage > 0)
+                {
+                    <del class="text-muted ms-2">@String.Format("{0:N0}₫", Model.Price)</del>
+                    <span class="badge bg-warning text-dark ms-2">-@((int)Model.DiscountPercentage)%</span>
+                }
+            </h4>
+
+            <p class="text-muted">@Model.Description</p>
+            <p><strong>Danh mục:</strong> @Model.Category?.Name</p>
+            <p><strong>Số lượng:</strong> @Model.Quantity</p>
+
+            <div class="mb-3">
+                <label class="form-label">Chọn size:</label><br />
+                <button class="btn btn-outline-secondary btn-sm">45</button>
+                <button class="btn btn-outline-secondary btn-sm">48</button>
+                <button class="btn btn-outline-secondary btn-sm">50</button>
+            </div>
+
+            <div class="d-flex gap-2 mb-3">
+                <span class="badge bg-success">Miễn phí giao hàng</span>
+                <span class="badge bg-info text-dark">Thu đổi 48h</span>
+                <span class="badge bg-primary">Hỗ trợ 24/7</span>
+            </div>
+
+            @if (Model.Quantity > 0)
             {
-                <img src="@Model.ImageUrl" class="img-fluid rounded" alt="Product Image"
-                     style="max-width: 80%; height: auto; object-fit: contain;">
+                <div class="d-grid gap-2">
+                    <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@Model.Id" asp-route-quantity="1"
+                       class="btn btn-danger btn-lg">
+                        <i class="bi bi-cart-check-fill me-1"></i> Mua ngay
+                    </a>
+                    <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@Model.Id" asp-route-quantity="1"
+                       class="btn btn-outline-primary btn-lg">
+                        Thêm vào giỏ hàng
+                    </a>
+                    <a href="tel:18001000" class="btn btn-dark btn-lg">Gọi ngay (miễn phí)</a>
+                </div>
             }
             else
             {
-                <p class="text-muted">No Image Available</p>
+                <span class="badge bg-danger text-white">Hết hàng</span>
             }
-        </div>
-
-        <!-- Cột Thông Tin (Căn lên trên cùng) -->
-        <div class="col-md-7 d-flex justify-content-center align-items-start">
-            <div class="card-body">
-                <h2 class="card-title fw-bold">@Model.Name</h2>
-                <h4 class="text-danger fw-bold">Price: @Model.Price.ToString("N0") VND</h4>
-                <p class="card-text"><strong>Description:</strong> @Model.Description</p>
-				<p class="card-text"><strong>Category:</strong> @Model.Category.Name</p>
-				<p class="card-text"><strong>Quantity:</strong> @Model.Quantity</p>
-                @if (Model.Quantity > 0)
-                {
-                    <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@Model.Id" asp-route-quantity="1">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="bi-cart-fill me-1"></i> Mua Ngay
-                        </button>
-                    </a>
-                }
-                else
-                {
-                    <span class="badge bg-danger text-white">Hết hàng</span>
-                }
-
-            </div>
         </div>
     </div>
 
-
-    <!-- Đặt phần "Sản phẩm tương tự" dưới phần thông tin sản phẩm -->
-    <h3 class="fw-bold mt-5">Sản Phẩm Tương Tự</h3>
-    <div class="row mt-2">
-        @foreach (var similarProduct in ViewBag.SimilarProducts as List<WebBanTrangSuc.Models.Product>)
+    <!-- Sản phẩm tương tự -->
+    <h3 class="fw-bold mt-5">Sản phẩm tương tự</h3>
+    <div class="row mt-3">
+        @foreach (var sp in ViewBag.SimilarProducts as List<WebBanTrangSuc.Models.Product>)
         {
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card product-card h-100 shadow-sm">
-                    <!-- Hình ảnh sản phẩm -->
-                    <div class="position-relative overflow-hidden">
-                        <img src="@similarProduct.ImageUrl" class="card-img-top product-img"
-                             alt="Product Image">
-                    </div>
-
-                    <!-- Nội dung sản phẩm -->
+                    <img src="@sp.ImageUrl" class="card-img-top product-img" alt="Product Image" />
                     <div class="card-body text-center">
-                        <h5 class="card-title">@similarProduct.Name</h5>
-                        <p class="text-primary fw-bold">@similarProduct.Price.ToString("N0") VND</p>
-                        <p class="card-text text-muted">@similarProduct.Description</p>
+                        <h6 class="card-title text-truncate">@sp.Name</h6>
+                        <p class="text-danger fw-bold">@String.Format("{0:N0}₫", sp.Price * (1 - sp.DiscountPercentage / 100))</p>
                     </div>
-
-
-                    <!-- Nút Action -->
                     <div class="card-footer text-center">
-                        <a asp-action="Display" asp-route-id="@similarProduct.Id" class="btn btn-outline-info btn-sm">Xem</a>
+                        <a asp-action="Details" asp-route-id="@sp.Id" class="btn btn-outline-info btn-sm">Xem</a>
                     </div>
                 </div>
             </div>
@@ -85,8 +209,7 @@
         }
 
     .product-img {
-        height: 250px;
-        width: 100%;
+        height: 220px;
         object-fit: contain;
         padding: 10px;
         transition: transform 0.3s ease-in-out;
@@ -95,9 +218,11 @@
     .product-card:hover .product-img {
         transform: scale(1.1);
     }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 </style>
-
-
-
-
 
