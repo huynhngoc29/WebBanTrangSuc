@@ -203,27 +203,53 @@ namespace WebBanTrangSuc.Controllers
         //    return View(products);
         //}
 
+        //public async Task<IActionResult> Index(string searchTerm, int? categoryId, int? subCategoryId)
+        //{
+        //    var products = await _productRepository.GetAllAsync();
+
+        //    if (categoryId.HasValue)
+        //    {
+        //        products = products.Where(p => p.CategoryId == categoryId).ToList();
+        //    }
+
+        //    if (subCategoryId.HasValue)
+        //    {
+        //        products = products.Where(p => p.SubCategoryId == subCategoryId).ToList();
+        //    }
+
+        //    var categories = await _categoryRepository.GetAllAsync();
+        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
+        //    ViewBag.SelectedCategory = categoryId;
+        //    ViewBag.SelectedSubCategory = subCategoryId;
+
+        //    return View(products);
+        //}
         public async Task<IActionResult> Index(string searchTerm, int? categoryId, int? subCategoryId)
         {
             var products = await _productRepository.GetAllAsync();
 
-            if (categoryId.HasValue)
+            // ✅ Lọc theo từ khóa tìm kiếm
+            if (!string.IsNullOrEmpty(searchTerm))
             {
-                products = products.Where(p => p.CategoryId == categoryId).ToList();
+                products = products.Where(p => !string.IsNullOrEmpty(p.Name) &&
+                                               p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
+            if (categoryId.HasValue)
+                products = products.Where(p => p.CategoryId == categoryId).ToList();
+
             if (subCategoryId.HasValue)
-            {
                 products = products.Where(p => p.SubCategoryId == subCategoryId).ToList();
-            }
 
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            ViewBag.SelectedCategory = categoryId;
-            ViewBag.SelectedSubCategory = subCategoryId;
+
+            ViewBag.SearchTerm = searchTerm; // ✅ giữ lại từ khóa
 
             return View(products);
         }
+
+
 
         public async Task<IActionResult> FlashSale()
         {

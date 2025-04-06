@@ -191,7 +191,7 @@
                         <p class="text-danger fw-bold">@String.Format("{0:N0}₫", sp.Price * (1 - sp.DiscountPercentage / 100))</p>
                     </div>
                     <div class="card-footer text-center">
-                        <a asp-action="Details" asp-route-id="@sp.Id" class="btn btn-outline-info btn-sm">Xem</a>
+                        <a asp-action="Display" asp-route-id="@sp.Id" class="btn btn-outline-info btn-sm">Xem</a>
                     </div>
                 </div>
             </div>

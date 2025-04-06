@@ -1,6 +1,16 @@
 ﻿@model List<WebBanTrangSuc.Models.Category>
 
 <ul class="navbar-nav mx-auto">
+    <li class="nav-item">
+        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Product" &&
+                        ViewContext.RouteData.Values["action"]?.ToString() == "Index" &&
+                        !ViewContext.HttpContext.Request.Query.ContainsKey("categoryId")
+                        ? "fw-bold text-primary" : "")"
+           asp-controller="Product" asp-action="Index" style="margin-right: -8px;margin-top: 0px;">
+            Tất cả sản phẩm
+        </a>
+    </li>
+
     @foreach (var category in Model)
     {
         var subCategories = category.CategorySubCategories?
@@ -35,7 +45,12 @@
         else
         {
             <li class="nav-item">
-                <a class="nav-link" href="#">@category.Name</a>
+                <a class="nav-link"
+                   asp-controller="Product"
+                   asp-action="Index"
+                   asp-route-categoryId="@category.Id">
+                    @category.Name
+                </a>
             </li>
         }
     }
@@ -48,3 +63,10 @@
         </a>
     </li>
 </ul>
+
+<style>
+    .nav-link:hover {
+        color: #555 !important;
+    }
+
+</style>

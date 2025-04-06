@@ -1,0 +1,53 @@
+﻿@model List<WebBanTrangSuc.Models.Order>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2 class="mb-4">📦 Danh sách đơn hàng</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Ngày đặt</th>
+            <th>Giá trị</th>
+            <th>Địa chỉ</th>
+            <th>Số điện thoại</th>
+            <th>Ghi chú</th>
+            <th>Chi tiết</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.CustomerName</td>
+                <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                <td>@order.TotalPrice.ToString("N0") ₫</td>
+                <td>@order.ShippingAddress</td>
+                <td>@order.PhoneNumber</td>
+                <td>@order.Notes</td>
+                <td>
+                    <ul class="mb-0">
+                        @foreach (var item in order.OrderDetails)
+                        {
+                            <li>@item.Product.Name x @item.Quantity (@item.Price.ToString("N0") ₫)</li>
+                        }
+                    </ul>
+                </td>
+                <td>
+                    <a href="/Admin/Order/Invoice/@order.Id" class="btn btn-sm btn-outline-success" target="_blank">
+                        🖨 In hóa đơn
+                    </a>
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

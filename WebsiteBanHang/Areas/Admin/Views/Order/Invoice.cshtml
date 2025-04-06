@@ -1,0 +1,57 @@
+﻿@model WebBanTrangSuc.Models.Order
+@{
+    ViewData["Title"] = "Invoice";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+<!-- CSS ẩn nút in và các phần không cần khi in -->
+<style>
+
+    {
+        display: none !important;
+    }
+
+    body {
+        margin: 0;
+        background: white;
+    }
+
+</style>
+
+<h2>🧾 HÓA ĐƠN BÁN HÀNG</h2>
+
+<p><strong>Mã đơn:</strong> @Model.Id</p>
+<p><strong>Khách hàng:</strong> @Model.CustomerName</p>
+<p><strong>SĐT:</strong> @Model.PhoneNumber</p>
+<p><strong>Địa chỉ:</strong> @Model.ShippingAddress</p>
+<p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy")</p>
+<p><strong>Ghi chú:</strong> @Model.Notes</p>
+
+<hr />
+
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>SL</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderDetails)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Price.ToString("N0") ₫</td>
+                <td>@(item.Price * item.Quantity).ToString("N0") ₫</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+<h4>Tổng cộng: @Model.TotalPrice.ToString("N0") ₫</h4>
+

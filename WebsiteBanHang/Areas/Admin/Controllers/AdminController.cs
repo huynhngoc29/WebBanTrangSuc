@@ -34,7 +34,7 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
         }
 
         // Route cho danh sách sản phẩm
-        [Route("Product")]
+        [Route("Products")]
         public async Task<IActionResult> Products(int page = 1, int pageSize = 10)
         {
             var products = await _productRepository.GetAllAsync();
