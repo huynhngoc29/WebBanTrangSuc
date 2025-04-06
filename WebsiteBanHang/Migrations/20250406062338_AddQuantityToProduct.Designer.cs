@@ -12,8 +12,8 @@ using WebBanTrangSuc.Models;
 namespace WebBanTrangSuc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250406041903_Updatedatabase")]
-    partial class Updatedatabase
+    [Migration("20250406062338_AddQuantityToProduct")]
+    partial class AddQuantityToProduct
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -366,6 +366,9 @@ namespace WebBanTrangSuc.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.Property<int>("SubCategoryId")
                         .HasColumnType("int");

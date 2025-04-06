@@ -26,5 +26,7 @@ namespace WebBanTrangSuc.Models
         // Mặc định là không có giảm giá (0%) và không nằm trong chương trình giảm giá
         public decimal DiscountPercentage { get; set; } = 0; // Không giảm giá
         public bool IsOnSale { get; set; } = false;  // Không giảm giá
+
+        public int Quantity { get; set; } = 0;
     }
 }

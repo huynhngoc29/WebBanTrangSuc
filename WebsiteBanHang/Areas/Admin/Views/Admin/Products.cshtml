@@ -21,11 +21,6 @@
         max-width: 1200px;
     }
 
-    h2 {
-        font-weight: 600;
-        color: #ee4d2d;
-    }
-
     .btn-action {
         font-size: 14px;
         padding: 5px 10px;
@@ -58,6 +53,7 @@
                     <th>Price</th>
                     <th>Description</th>
                     <th>Category</th>
+					<th>Quantity</th>
                     <th>Image</th>
                     <th>Actions</th>
                 </tr>
@@ -70,13 +66,14 @@
                         <td>@product.Price.ToString("N0") ₫</td>
                         <td>@product.Description</td>
                         <td>@product.Category.Name</td>
+                        <td>@product.Quantity</td>
                         <td>
                             <img src="@product.ImageUrl" class="img-thumbnail" alt="Product Image" style="max-width: 100px;" />
                         </td>
                         <td>
                             <a href="@Url.Action("Update", "Admin", new { area = "Admin", id = product.Id })" class="btn btn-warning btn-action">✏ Chỉnh sửa</a>
 
-                            <a href="@Url.Action("Details", "Admin", new { area = "Admin", id = product.Id })" class="btn btn-info">Xem</a>
+                            @* <a href="@Url.Action("Details", "Admin", new { area = "Admin", id = product.Id })" class="btn btn-info">Xem</a> *@
                             @* <!-- Form xóa sản phẩm --> *@
                             @* <a href="javascript:void(0);" onclick="confirmDelete('@product.Id')" class="btn btn-danger">🗑 Xóa</a> *@
 

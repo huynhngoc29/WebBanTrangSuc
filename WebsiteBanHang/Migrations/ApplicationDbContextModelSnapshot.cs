@@ -364,6 +364,9 @@ namespace WebBanTrangSuc.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
                     b.Property<int>("SubCategoryId")
                         .HasColumnType("int");
 

@@ -200,6 +200,7 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 existingProduct.Name = product.Name;
                 existingProduct.Price = product.Price;
                 existingProduct.Description = product.Description;
+                existingProduct.Quantity = product.Quantity;
                 existingProduct.CategoryId = product.CategoryId;
                 existingProduct.ImageUrl = product.ImageUrl;
 
