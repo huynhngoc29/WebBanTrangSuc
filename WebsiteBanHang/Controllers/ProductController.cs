@@ -175,35 +175,78 @@ namespace WebBanTrangSuc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string searchTerm, int? categoryId)
+        //public async Task<IActionResult> Index(string searchTerm, int? categoryId)
+        //{
+        //    var products = await _productRepository.GetAllAsync();
+
+        //    // Lọc theo tên sản phẩm
+        //    if (!string.IsNullOrEmpty(searchTerm))
+        //    {
+        //        products = products.Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        //    }
+
+        //    // Lọc theo hãng (Category)
+        //    if (categoryId.HasValue && categoryId > 0)
+        //    {
+        //        products = products.Where(p => p.CategoryId == categoryId).ToList();
+        //    }
+
+
+        //    // Lấy danh sách hãng (Category) từ CSDL
+        //    var categories = await _categoryRepository.GetAllAsync();
+        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
+
+        //    // Truyền dữ liệu vào ViewBag để hiển thị lại trên giao diện
+        //    ViewBag.SelectedCategory = categoryId;
+        //    ViewBag.SearchTerm = searchTerm;
+
+        //    return View(products);
+        //}
+
+        public async Task<IActionResult> Index(string searchTerm, int? categoryId, int? subCategoryId)
         {
             var products = await _productRepository.GetAllAsync();
 
-            // Lọc theo tên sản phẩm
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                products = products.Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            // Lọc theo hãng (Category)
-            if (categoryId.HasValue && categoryId > 0)
+            if (categoryId.HasValue)
             {
                 products = products.Where(p => p.CategoryId == categoryId).ToList();
             }
 
+            if (subCategoryId.HasValue)
+            {
+                products = products.Where(p => p.SubCategoryId == subCategoryId).ToList();
+            }
 
-            // Lấy danh sách hãng (Category) từ CSDL
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
-
-            // Truyền dữ liệu vào ViewBag để hiển thị lại trên giao diện
             ViewBag.SelectedCategory = categoryId;
-            ViewBag.SearchTerm = searchTerm;
+            ViewBag.SelectedSubCategory = subCategoryId;
 
             return View(products);
         }
 
+        public async Task<IActionResult> FlashSale()
+        {
+            var products = await _productRepository.GetAllAsync();
+            var flashSaleProducts = products
+                .Where(p => p.IsOnSale && p.DiscountPercentage > 0)
+                .OrderByDescending(p => p.DiscountPercentage)
+                .ToList();
 
+            return View(flashSaleProducts);
+        }
+        public async Task<IActionResult> NewProducts()
+        {
+            var products = await _productRepository.GetAllAsync();
+
+            // Giả sử bạn sắp xếp theo thời gian tạo mới nhất nếu có
+            var newProducts = products
+                .OrderByDescending(p => p.Id) // hoặc p.CreatedAt nếu có field thời gian
+                .Take(100) // tùy theo giới hạn bạn muốn
+                .ToList();
+
+            return View(newProducts);
+        }
 
 
     }

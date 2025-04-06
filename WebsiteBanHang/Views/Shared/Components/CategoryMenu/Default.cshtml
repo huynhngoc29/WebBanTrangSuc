@@ -17,9 +17,17 @@
                     @category.Name
                 </a>
                 <ul class="dropdown-menu">
-                    @foreach (var sub in subCategories)
+                    @foreach (var catSub in category.CategorySubCategories)
                     {
-                        <li><a class="dropdown-item" href="#">@sub.Name</a></li>
+                        <li>
+                            <a class="dropdown-item"
+                               asp-controller="Product"
+                               asp-action="Index"
+                               asp-route-categoryId="@category.Id"
+                               asp-route-subCategoryId="@catSub.SubCategory.Id">
+                                @catSub.SubCategory.Name
+                            </a>
+                        </li>
                     }
                 </ul>
             </li>

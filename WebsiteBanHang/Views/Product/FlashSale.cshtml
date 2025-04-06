@@ -2,35 +2,53 @@
 
 @{
     ViewData["Title"] = "Flash Sale";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    int numOfQuality = 1;
 }
 
-<div class="FlashSale">
-    <div class="FlashSaleTitle">
-        <img src="https://theme.hstatic.net/200000274839/1000946002/14/flash-sale.png?v=76" class="card-img-top" alt="Flash Sale" style="width: 200px" height="70px">
-    </div>
-    <div class="ProductSale" style="display: flex; justify-content: space-between;">
-        @if (Model == null || !Model.Any())
-        {
-            <p>@ViewBag.Message</p>  <!-- Hiển thị thông báo nếu không có sản phẩm giảm giá -->
-        }
-        else
-        {
-            @foreach (var product in Model)
-            {
-                <div class="card" style="width: 18rem;">
-                    <div class="sale-label">@product.DiscountPercentage% GIẢM</div>
-                    <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
-                    <div class="card-body">
-                        <h5 class="card-title">@product.Name</h5>
-                        <div class="d-flex justify-content-between">
-                            <p class="card-price" style="font-weight: bold; color: #e74c3c;">@String.Format("{0:C}", product.Price * (1 - product.DiscountPercentage / 100))</p>
-                            <p class="card-price-old" style="text-decoration: line-through; color: #7f8c8d;">@String.Format("{0:C}", product.Price)</p>
-                        </div>
-                        <p class="sold-status" style="color: #e74c3c; font-weight: bold; margin-top: 10px;">🔥 Đã bán 21 sản phẩm</p>
-                    </div>
+<h3 class="fw-bold text-danger mb-4">⚡ Tất cả sản phẩm Flash Sale</h3>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        var discountedPrice = item.Price * (1 - item.DiscountPercentage / 100);
+        var remaining = item.Quantity <= 5 ? $"🔥 CHỈ CÒN {item.Quantity}" : "ĐANG BÁN CHẠY";
+
+        <div class="col-md-3 mb-4">
+            <div class="card product-card h-100 text-center shadow-sm border-0">
+                <!-- % giảm giá -->
+                <span class="position-absolute top-0 end-0 badge bg-warning text-dark">
+                    ⚡ -@((int)item.DiscountPercentage)%
+                </span>
+
+                <!-- Ảnh -->
+                <img src="@item.ImageUrl" class="card-img-top product-img" style="height: 200px; object-fit: contain;" alt="@item.Name" />
+
+                <div class="card-body p-2">
+                    <div class="text-muted small">4.4 ★</div>
+                    <h6 class="card-title mt-1 mb-2 text-truncate">@item.Name</h6>
+                    <p class="fw-bold text-danger mb-2">@discountedPrice.ToString("N0")₫</p>
+
+                    <!-- Trạng thái -->
+                    <span class="badge" style="background: linear-gradient(to right, orange, red); color: white; font-size: 13px;">
+                        @remaining
+                    </span>
                 </div>
-            }
-        }
-    </div>
+                <div class="card-footer text-center">
+                    <a asp-action="Display" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">Chi tiết</a>
+                    <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@item.Id" asp-route-quantity="@numOfQuality">
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="bi-cart-fill me-1"></i> Mua Ngay
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+<style>
+    .product-card:hover {
+        transform: translateY(-5px);
+        transition: 0.3s;
+    }
+</style>
