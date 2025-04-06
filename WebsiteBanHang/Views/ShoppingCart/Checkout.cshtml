@@ -14,12 +14,6 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
                 <div class="form-floating mb-3">
-                    <input asp-for="ShippingAddress" class="form-control" placeholder="Địa chỉ giao hàng" />
-                    <label asp-for="ShippingAddress">Địa chỉ giao hàng</label>
-                    <span asp-validation-for="ShippingAddress" class="text-danger"></span>
-                </div>
-
-                <div class="form-floating mb-3">
                     <input asp-for="CustomerName" class="form-control" placeholder="Tên khách hàng" />
                     <label asp-for="CustomerName">Tên khách hàng</label>
                     <span asp-validation-for="CustomerName" class="text-danger"></span>
@@ -31,6 +25,12 @@
                     <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
 
+
+                <div class="form-floating mb-3">
+                    <input asp-for="ShippingAddress" class="form-control" placeholder="Địa chỉ giao hàng" />
+                    <label asp-for="ShippingAddress">Địa chỉ giao hàng</label>
+                    <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                </div>
 
                 <div class="form-floating mb-3">
                     <textarea asp-for="Notes" class="form-control" placeholder="Ghi chú cho đơn hàng"></textarea>
