@@ -93,6 +93,19 @@ namespace WebBanTrangSuc.Controllers
                 Price = i.Price
             }).ToList();
 
+            foreach (var item in cart.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                product.Quantity -= item.Quantity; // ✅ Trừ số lượng tồn kho
+
+                order.OrderDetails.Add(new OrderDetail
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    Price = item.Price
+                });
+            }
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 

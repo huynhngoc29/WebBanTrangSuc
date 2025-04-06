@@ -71,21 +71,7 @@
         border-radius: 8px;
     }
 
-    /* Nút Update */
-    button.btn {
-        background-color: #ee4d2d;
-        border: none;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 10px;
-        font-size: 18px;
-        cursor: pointer;
-        width: 100%;
-    }
 
-        button.btn:hover {
-            background-color: #d84315;
-        }
 
     /* Style cho file input */
     input[type="file"] {
@@ -155,11 +141,11 @@ danger"></span>
         </div>
         <div class="col-8">
             <img src="@Model.ImageUrl" alt="Product Image" style="max-width:200px;" id="previewImage" />
-            <!-- Nút cập nhật và cancel -->
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">💾 Update</button>
-                <a href="@Url.Action("Product", "Admin", new { area = "Admin" })" class="btn btn-secondary">❌ Cancel</a>
-            </div>
+         </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-left: 80px; margin-top: 20px; height: 40px">💾 Update</button>
+        <a href="@Url.Action("Product", "Admin", new { area = "Admin" })" class="btn btn-secondary" style="margin-left: 250px;margin-top: 20px; height: 40px">❌ Cancel</a>
+      
 
     </form>
 

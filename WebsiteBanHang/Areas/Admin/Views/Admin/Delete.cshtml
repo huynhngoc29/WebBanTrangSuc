@@ -41,33 +41,7 @@
         margin-bottom: 8px;
     }
 
-    .btn {
-        background-color: #ee4d2d;
-        border: none;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 10px;
-        font-size: 18px;
-        cursor: pointer;
-        width: 100%;
-    }
-
-        .btn:hover {
-            background-color: #d84315;
-        }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        padding: 12px 25px;
-        border-radius: 10px;
-        font-size: 18px;
-        color: white;
-    }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
+    
     .form-group {
         margin-bottom: 20px;
     }
@@ -105,9 +79,9 @@
     </div>
 
     <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-danger">🗑 Delete</button>
-            <a href="@Url.Action("Product", "Admin", new { area = "Admin" })" class="btn btn-secondary">❌ Cancel</a>
-        </div>
+        <button type="submit" class="btn btn-primary" style="margin-left: 80px; margin-top: 20px; height: 40px">🗑 Delete</button>
+        <a href="@Url.Action("Product", "Admin", new { area = "Admin" })" class="btn btn-secondary" style="margin-left: 250px;margin-top: 20px; height: 40px">
+            ❌ Cancel
+        </a>
     </form>
 </div>
