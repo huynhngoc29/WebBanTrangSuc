@@ -13,10 +13,20 @@ public class CategoryMenuViewComponent : ViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        var categories = await _context.Categories.Include(c => c.CategorySubCategories)
+        var categories = await _context.Categories
+            .Include(c => c.CategorySubCategories)
                 .ThenInclude(cs => cs.SubCategory)
             .ToListAsync();
 
+        // Thêm mục "Tất cả sản phẩm"
+        categories.Insert(0, new Category
+        {
+            Id = 0,
+            CategorySubCategories = new List<CategorySubCategory>()
+        });
+
         return View(categories);
     }
+
 }
+

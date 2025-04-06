@@ -73,30 +73,32 @@ namespace WebBanTrangSuc.Controllers
         }
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Checkout(Order order)
         {
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart");
             if (cart == null || !cart.Items.Any())
             {
-                // Xử lý giỏ hàng trống... 
+                // Nếu giỏ hàng trống thì quay lại
                 return RedirectToAction("Index");
             }
 
             var user = await _userManager.GetUserAsync(User);
+
             order.UserId = user.Id;
             order.OrderDate = DateTime.UtcNow;
             order.TotalPrice = cart.Items.Sum(i => i.Price * i.Quantity);
-            order.OrderDetails = cart.Items.Select(i => new OrderDetail
-            {
-                ProductId = i.ProductId,
-                Quantity = i.Quantity,
-                Price = i.Price
-            }).ToList();
+
+            order.OrderDetails = new List<OrderDetail>(); // Khởi tạo danh sách
 
             foreach (var item in cart.Items)
             {
+                // Trừ số lượng tồn kho
                 var product = await _context.Products.FindAsync(item.ProductId);
-                product.Quantity -= item.Quantity; // ✅ Trừ số lượng tồn kho
+                if (product != null)
+                {
+                    product.Quantity -= item.Quantity;
+                }
 
                 order.OrderDetails.Add(new OrderDetail
                 {
@@ -106,12 +108,15 @@ namespace WebBanTrangSuc.Controllers
                 });
             }
 
+            // ✅ Save đơn hàng
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
+            // Xoá giỏ hàng sau khi đặt hàng thành công
             HttpContext.Session.Remove("Cart");
 
-            return View("OrderCompleted", order.Id); // Trang xác nhận hoàn thành đơn hàng
+            return View("OrderCompleted", order.Id);
         }
+
     }
 }

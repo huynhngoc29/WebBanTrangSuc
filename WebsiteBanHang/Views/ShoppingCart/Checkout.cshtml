@@ -20,10 +20,25 @@
                 </div>
 
                 <div class="form-floating mb-3">
+                    <input asp-for="CustomerName" class="form-control" placeholder="Tên khách hàng" />
+                    <label asp-for="CustomerName">Tên khách hàng</label>
+                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Số điện thoại" />
+                    <label asp-for="PhoneNumber">Số điện thoại</label>
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-floating mb-3">
                     <textarea asp-for="Notes" class="form-control" placeholder="Ghi chú cho đơn hàng"></textarea>
                     <label asp-for="Notes">Ghi chú</label>
                     <span asp-validation-for="Notes" class="text-danger"></span>
                 </div>
+
+
 
                 <button type="submit" class="w-100 btn btn-lg btn-primary">Đặt hàng</button>
             </form>

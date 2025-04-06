@@ -108,31 +108,32 @@
 <div class="container mt-4">
     <!-- Tiêu đề + nút thêm sản phẩm, chỉ hiển thị cho Admin -->
     <section class="mb-4">
+
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fw-bold">Danh Sách Điện Thoại</h2>
+            <h2 class="fw-bold" style="margin-top:20px">Danh Sách Sản Phẩm </h2>
             @if (currentUser != null && User.IsInRole("Admin"))
             {
-                <a href="/Admin/Product" class="btn btn-outline-primary">
-                    <i class="fa fa-plus"></i> Quản lý sản phẩm
+                <a href="/Admin/Products" class="btn btn-outline-primary" style="margin-top:20px">
+                    <i class="fa fa-plus" ></i> Quản lý sản phẩm
                 </a>
             }
 
         </div>
     </section>
     <form method="get" asp-controller="Product" asp-action="Index" class="d-flex">
-        <!-- Dropdown danh mục -->
-        <select name="categoryId" class="form-select me-2" style="width: 200px;" onchange="updateFilter()">
-            <option value="">📂 Tất cả danh mục</option>
-            @if (ViewBag.Categories != null)
-            {
-                @foreach (var category in ViewBag.Categories)
-                {
-                    <option value="@category.Value" selected="@(ViewBag.SelectedCategory?.ToString() == category.Value ? "selected" : null)">
-                        @category.Text
-                    </option>
-                }
-            }
-        </select>
+        @* <!-- Dropdown danh mục --> *@
+        @* <select name="categoryId" class="form-select me-2" style="width: 200px;" onchange="updateFilter()"> *@
+        @*     <option value="">📂 Tất cả danh mục</option> *@
+        @*     @if (ViewBag.Categories != null) *@
+        @*     { *@
+        @*         @foreach (var category in ViewBag.Categories) *@
+        @*         { *@
+        @*             <option value="@category.Value" selected="@(ViewBag.SelectedCategory?.ToString() == category.Value ? "selected" : null)"> *@
+        @*                 @category.Text *@
+        @*             </option> *@
+        @*         } *@
+        @*     } *@
+        @* </select> *@
 
         @* <!-- Sửa lại tên input --> *@
         @* <input type="text" name="searchTerm" placeholder="Bạn tìm gì..." class="form-control search-bar me-2" value="@ViewBag.SearchTerm" /> *@

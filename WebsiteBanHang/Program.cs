@@ -80,10 +80,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebBanTrangSuc.Models;
 using WebBanTrangSuc.Repositories;
+using QuestPDF.Infrastructure;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 // Add services to the container.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -159,4 +161,5 @@ name: "default",
 pattern: "{controller=Home}/{action=Index}/{id?}");
 app.UseStaticFiles();
 app.MapRazorPages();
+QuestPDF.Settings.License = LicenseType.Community;
 app.Run();
