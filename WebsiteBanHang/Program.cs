@@ -120,7 +120,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 builder.Services.AddScoped<ISubCategoryRepository, EFSubCategoryRepository>();
-
+builder.WebHost.UseWebRoot("wwwroot");
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
