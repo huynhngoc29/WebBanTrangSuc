@@ -48,7 +48,6 @@ namespace WebBanTrangSuc.Controllers
                 Name = product.Name,
                 Price = product.Price,
                 Quantity = quantity,
-                Size = size // ✅ Gán size nếu có
             };
 
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart") ?? new ShoppingCart();
@@ -92,7 +91,6 @@ namespace WebBanTrangSuc.Controllers
             return View(new Order());
         }
 
-        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> Checkout(Order order)
         {
@@ -144,7 +142,6 @@ namespace WebBanTrangSuc.Controllers
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
                     Price = item.Price,
-                    Size = item.Size // 🟢 nếu bạn truyền size trong CartItem
                 });
             }
 

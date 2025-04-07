@@ -135,22 +135,6 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 await _productRepository.AddAsync(product);
 
                 var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
-                if (category != null && category.Name.ToLower() == "nhẫn")
-                {
-                    var defaultSizes = new List<string> { "45", "48", "50", "52", "55" };
-
-                    foreach (var size in defaultSizes)
-                    {
-                        _context.ProductVariants.Add(new ProductVariant
-                        {
-                            ProductId = product.Id,
-                            Size = size,
-                            Stock = 0
-                        });
-                    }
-
-                    await _context.SaveChangesAsync();
-                }
 
                 return RedirectToAction("Products", "Admin", new { area = "Admin" });
             }
