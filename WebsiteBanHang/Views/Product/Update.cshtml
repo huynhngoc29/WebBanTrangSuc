@@ -30,11 +30,47 @@
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <label for="Quantity">Số lượng</label>
         <input asp-for="Quantity" class="form-control" />
         <span asp-validation-for="Quantity" class="text-danger"></span>
     </div>
+    @if (Model.CategoryId == 1 && Model.Variants?.Any() == true)
+    {
+        <h5 class="fw-bold mt-4">Cập nhật tồn kho từng size</h5>
+        <div class="row">
+            @for (int i = 0; i < Model.Variants.Count; i++)
+            {
+                <div class="col-md-4 mb-2">
+                    <label>Size @Model.Variants[i].Size:</label>
+                    <input type="hidden" name="Variants[@i].Id" value="@Model.Variants[i].Id" />
+                    <input type="hidden" name="Variants[@i].Size" value="@Model.Variants[i].Size" />
+                    <input type="number" name="Variants[@i].Stock" value="@Model.Variants[i].Stock" class="form-control" min="0" />
+                </div>
+            }
+        </div>
+    }
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group">
+        <label for="CategoryId">Danh mục</label>
+        @Html.DropDownListFor(m => m.CategoryId, (SelectList)ViewBag.Categories, "Chọn danh mục", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+    </div>
+
+	<div class="form-group">
+		<label for="SubCategoryId">Loại sản phẩm con</label>
+		@Html.DropDownListFor(m => m.SubCategoryId, (SelectList)ViewBag.SubCategories, "Chọn loại", new { @class = "form-control" })
+		@Html.ValidationMessageFor(m => m.SubCategoryId, "", new { @class = "text-danger" })
+    </div>
+
     @* Hiển thị ảnh hiện tại *@
     <div class="mb-3">
         <label class="form-label">Current Image</label>
@@ -56,13 +92,39 @@
         <input type="file" name="imageUrl" class="form-control" />
     </div>
 
-    <div class="form-group">
-        <label for="CategoryId">Danh mục</label>
-        @Html.DropDownListFor(m => m.CategoryId, (SelectList)ViewBag.Categories, "Chọn danh mục", new { @class = "form-control" })
-        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
-    </div>
 
     <button type="submit" class="btn btn-primary">Update</button>
     <a href="/Admin/Product" class="btn btn-secondary">Cancel</a> <!-- Cập nhật đường dẫn để quay lại trang Admin/Product -->
 
 </form>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#CategoryId').change(function () {
+                var categoryId = $(this).val();
+                if (categoryId) {
+                    $.get('/Product/GetSubCategoriesByCategory', { categoryId: categoryId }, function (data) {
+                        var subSelect = $('#SubCategoryId');
+                        subSelect.empty();
+                        subSelect.append($('<option>', {
+                            value: '',
+                            text: '-- Chọn loại --'
+                        }));
+                        $.each(data, function (i, item) {
+                            subSelect.append($('<option>', {
+                                value: item.id,
+                                text: item.name
+                            }));
+                        });
+                    });
+                } else {
+                    $('#SubCategoryId').empty().append($('<option>', {
+                        value: '',
+                        text: '-- Chọn loại --'
+                    }));
+                }
+            });
+        });
+    </script>
+}

@@ -113,11 +113,9 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
         public async Task<IActionResult> Add()
         {
             var categories = await _categoryRepository.GetAllAsync();
+            var subCategories = await _subCategoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
-
-            // Load tất cả SubCategory ban đầu hoặc để trống
-            ViewBag.SubCategories = new SelectList(new List<SubCategory>(), "Id", "Name");
-
+            ViewBag.SubCategories = new SelectList(subCategories, "Id", "Name");
             return View();
         }
 
@@ -125,35 +123,6 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [Route("Product/Add")]
-        //public async Task<IActionResult> Add(Product product, IFormFile imageUrl)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        if (imageUrl != null)
-        //        {
-        //            product.ImageUrl = await SaveImage(imageUrl);
-        //        }
-
-        //        await _productRepository.AddAsync(product);
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    // Nếu không thành công, hiển thị lại form với thông tin đã nhập
-        //    var categories = await _categoryRepository.GetAllAsync();
-        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
-        //    return View(product);
-        //}
-        public async Task<IActionResult> GetSubCategoriesByCategory(int categoryId)
-        {
-            var subCategories = await _context.CategorySubCategories
-                .Where(cs => cs.CategoryId == categoryId)
-                .Include(cs => cs.SubCategory)
-                .Select(cs => cs.SubCategory!)
-                .ToListAsync();
-
-            return Json(new SelectList(subCategories, "Id", "Name"));
-        }
-
         public async Task<IActionResult> Add(Product product, IFormFile imageUrl)
         {
             if (ModelState.IsValid)
@@ -162,33 +131,63 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 {
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
-                var isValidSubCategory = await _context.CategorySubCategories
-    .AnyAsync(cs => cs.CategoryId == product.CategoryId && cs.SubCategoryId == product.SubCategoryId);
 
-                if (!isValidSubCategory)
+                await _productRepository.AddAsync(product);
+
+                var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
+                if (category != null && category.Name.ToLower() == "nhẫn")
                 {
-                    ModelState.AddModelError("SubCategoryId", "Loại sản phẩm không hợp lệ với danh mục đã chọn.");
+                    var defaultSizes = new List<string> { "45", "48", "50", "52", "55" };
+
+                    foreach (var size in defaultSizes)
+                    {
+                        _context.ProductVariants.Add(new ProductVariant
+                        {
+                            ProductId = product.Id,
+                            Size = size,
+                            Stock = 0
+                        });
+                    }
+
+                    await _context.SaveChangesAsync();
                 }
 
-                else
-                {
-                    await _productRepository.AddAsync(product);
-                    return RedirectToAction("Product", "Admin", new { area = "Admin" });
-                }
+                return RedirectToAction("Products", "Admin", new { area = "Admin" });
             }
 
+            // Load lại Category + SubCategory khi lỗi
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
 
-            var subCategoryList = await _context.CategorySubCategories
+            var subCategories = await _context.CategorySubCategories
                 .Where(cs => cs.CategoryId == product.CategoryId)
                 .Include(cs => cs.SubCategory)
                 .Select(cs => cs.SubCategory!)
                 .ToListAsync();
-            ViewBag.SubCategories = new SelectList(subCategoryList, "Id", "Name", product.SubCategoryId);
+
+            ViewBag.SubCategories = new SelectList(subCategories, "Id", "Name", product.SubCategoryId);
 
             return View(product);
         }
+
+        [HttpGet]
+        [Route("Admin/GetSubCategoriesByCategory")]
+        public async Task<IActionResult> GetSubCategoriesByCategory(int categoryId)
+        {
+            var subCategories = await _context.CategorySubCategories
+                .Where(cs => cs.CategoryId == categoryId)
+                .Include(cs => cs.SubCategory)
+                .Select(cs => new
+                {
+                    value = cs.SubCategory!.Id,
+                    text = cs.SubCategory.Name
+                })
+                .ToListAsync();
+
+            return Json(subCategories);
+        }
+
+
 
 
         private async Task<string> SaveImage(IFormFile image)
@@ -224,7 +223,9 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
             }
 
             var categories = await _categoryRepository.GetAllAsync();
+            var subCategories = await _subCategoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+            ViewBag.SubCategories = new SelectList(subCategories, "Id", "Name");
             return View(product);
         }
 
@@ -263,6 +264,7 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 existingProduct.Description = product.Description;
                 existingProduct.Quantity = product.Quantity;
                 existingProduct.CategoryId = product.CategoryId;
+                existingProduct.SubCategoryId = product.SubCategoryId;
                 existingProduct.ImageUrl = product.ImageUrl;
 
                 await _productRepository.UpdateAsync(existingProduct);
@@ -272,6 +274,13 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
             // Nếu ModelState không hợp lệ, hiển thị lại form và các danh mục
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            var subCategories = await _context.CategorySubCategories
+                .Where(cs => cs.CategoryId == product.CategoryId)
+                .Include(cs => cs.SubCategory)
+                .Select(cs => cs.SubCategory!)
+                .ToListAsync();
+
+            ViewBag.SubCategories = new SelectList(subCategories, "Id", "Name", product.SubCategoryId);
             return View(product);
         }
 

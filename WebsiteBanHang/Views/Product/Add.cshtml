@@ -1,5 +1,4 @@
-﻿
-@model WebBanTrangSuc.Models.Product
+﻿@model WebBanTrangSuc.Models.Product
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
 	ViewData["Title"] = "AddProduct";
@@ -9,19 +8,21 @@
 <h1>Add Product</h1>
 
 <form asp-action="Add" method="post" enctype="multipart/form-data">
-
 	@Html.AntiForgeryToken()
 	<div asp-validation-summary="All" class="text-danger"></div>
+
 	<div class="form-group">
 		<label asp-for="Name"></label>
 		<input asp-for="Name" class="form-control" />
 		<span asp-validation-for="Name" class="text-danger"></span>
 	</div>
+
 	<div class="form-group">
 		<label asp-for="Price"></label>
 		<input asp-for="Price" class="form-control" />
 		<span asp-validation-for="Price" class="text-danger"></span>
 	</div>
+
 	<div class="form-group">
 		<label asp-for="Description"></label>
 		<textarea asp-for="Description" class="form-control"></textarea>
@@ -29,20 +30,77 @@
 	</div>
 
 	<div class="form-group">
-		<label for="Quantity">Số lượng</label>
+		<label asp-for="Quantity">Số lượng</label>
 		<input asp-for="Quantity" class="form-control" />
 		<span asp-validation-for="Quantity" class="text-danger"></span>
 	</div>
 
 	<div class="form-group">
-		<label asp-for="CategoryId">Category</label>
-		<select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control"></select>
+		<label asp-for="CategoryId">Danh mục</label>
+		<select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control" id="CategoryId">
+			<option value="">-- Chọn danh mục --</option>
+		</select>
 	</div>
 
 	<div class="form-group">
-		<label asp-for="ImageUrl">Image</label>
-		<input type="file" asp-for="ImageUrl" class="form-control" />
+		<label asp-for="SubCategoryId">Loại sản phẩm con</label>
+		<select asp-for="SubCategoryId" class="form-control" id="SubCategoryId">
+			<option value="">-- Chọn loại --</option>
+		</select>
 	</div>
+
+	@if (ViewBag.CategoryName?.ToLower() == "nhẫn")
+	{
+		<h5 class="fw-bold">Thêm tồn kho cho từng size</h5>
+		<div class="row">
+			@for (int i = 0; i < 3; i++)
+			{
+				var size = i == 0 ? 45 : i == 1 ? 48 : 50;
+				<div class="col-md-4 mb-3">
+					<label>Size @size:</label>
+					<input type="hidden" name="Variants[@i].Size" value="@size" />
+					<input type="number" name="Variants[@i].Stock" class="form-control" min="0" />
+				</div>
+			}
+		</div>
+	}
+
+	<div class="form-group">
+		<label asp-for="ImageUrl">Image</label>
+		<input type="file" name="imageUrl" class="form-control" />
+	</div>
+
 	<button type="submit" class="btn btn-primary">Add</button>
 </form>
 
+@section Scripts {
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('#CategoryId').change(function () {
+				var categoryId = $(this).val();
+				if (categoryId) {
+					$.get('/Product/GetSubCategoriesByCategory', { categoryId: categoryId }, function (data) {
+						var subSelect = $('#SubCategoryId');
+						subSelect.empty();
+						subSelect.append($('<option>', {
+							value: '',
+							text: '-- Chọn loại --'
+						}));
+						$.each(data, function (i, item) {
+							subSelect.append($('<option>', {
+								value: item.id,
+								text: item.name
+							}));
+						});
+					});
+				} else {
+					$('#SubCategoryId').empty().append($('<option>', {
+						value: '',
+						text: '-- Chọn loại --'
+					}));
+				}
+			});
+		});
+	</script>
+}
