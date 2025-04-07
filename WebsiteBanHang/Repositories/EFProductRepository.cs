@@ -50,6 +50,21 @@ namespace WebBanTrangSuc.Repositories
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
         }
+        public async Task<Product?> GetByIdWithCategoryAndVariantsAsync(int id)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Variants)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        public async Task<Product?> GetByIdWithVariantsAsync(int id)
+        {
+            return await _context.Products
+                .Include(p => p.Variants)
+                .Include(p => p.Category) // nếu cần cho hiển thị tên danh mục
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
 
     }
 }

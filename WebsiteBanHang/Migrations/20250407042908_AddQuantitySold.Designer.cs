@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBanTrangSuc.Models;
 
@@ -11,9 +12,11 @@ using WebBanTrangSuc.Models;
 namespace WebBanTrangSuc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407042908_AddQuantitySold")]
+    partial class AddQuantitySold
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,7 +270,7 @@ namespace WebBanTrangSuc.Migrations
 
                     b.HasIndex("SubCategoryId");
 
-                    b.ToTable("CategorySubCategories");
+                    b.ToTable("CategorySubCategory");
                 });
 
             modelBuilder.Entity("WebBanTrangSuc.Models.Order", b =>
@@ -328,14 +331,8 @@ namespace WebBanTrangSuc.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductVariantId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<string>("Size")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -421,31 +418,6 @@ namespace WebBanTrangSuc.Migrations
                     b.ToTable("ProductImages");
                 });
 
-            modelBuilder.Entity("WebBanTrangSuc.Models.ProductVariant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductVariants");
-                });
-
             modelBuilder.Entity("WebBanTrangSuc.Models.Promotion", b =>
                 {
                     b.Property<int>("Id")
@@ -491,7 +463,7 @@ namespace WebBanTrangSuc.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SubCategories");
+                    b.ToTable("SubCategory");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -624,17 +596,6 @@ namespace WebBanTrangSuc.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("WebBanTrangSuc.Models.ProductVariant", b =>
-                {
-                    b.HasOne("WebBanTrangSuc.Models.Product", "Product")
-                        .WithMany("Variants")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("WebBanTrangSuc.Models.Category", b =>
                 {
                     b.Navigation("CategorySubCategories");
@@ -650,8 +611,6 @@ namespace WebBanTrangSuc.Migrations
             modelBuilder.Entity("WebBanTrangSuc.Models.Product", b =>
                 {
                     b.Navigation("ImageUrls");
-
-                    b.Navigation("Variants");
                 });
 
             modelBuilder.Entity("WebBanTrangSuc.Models.SubCategory", b =>

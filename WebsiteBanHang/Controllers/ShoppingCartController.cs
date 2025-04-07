@@ -18,9 +18,28 @@ namespace WebBanTrangSuc.Controllers
             _context = context;
             _userManager = userManager;
         }
-        public async Task<IActionResult> AddToCart(int productId, int quantity)
+        //public async Task<IActionResult> AddToCart(int productId, int quantity)
+        //{
+        //    // Giả sử bạn có phương thức lấy thông tin sản phẩm từ productId 
+        //    var product = await GetProductFromDatabase(productId);
+
+        //    var cartItem = new CartItem
+        //    {
+        //        ProductId = productId,
+        //        Name = product.Name,
+        //        Price = product.Price,
+        //        Quantity = quantity
+        //    };
+        //    var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart") ??
+        //new ShoppingCart();
+        //    cart.AddItem(cartItem);
+
+        //    HttpContext.Session.SetObjectAsJson("Cart", cart);
+
+        //    return RedirectToAction("Index");
+        //}
+        public async Task<IActionResult> AddToCart(int productId, int quantity, string? size = null)
         {
-            // Giả sử bạn có phương thức lấy thông tin sản phẩm từ productId 
             var product = await GetProductFromDatabase(productId);
 
             var cartItem = new CartItem
@@ -28,16 +47,17 @@ namespace WebBanTrangSuc.Controllers
                 ProductId = productId,
                 Name = product.Name,
                 Price = product.Price,
-                Quantity = quantity
+                Quantity = quantity,
+                Size = size // ✅ Gán size nếu có
             };
-            var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart") ??
-        new ShoppingCart();
-            cart.AddItem(cartItem);
 
+            var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart") ?? new ShoppingCart();
+            cart.AddItem(cartItem);
             HttpContext.Session.SetObjectAsJson("Cart", cart);
 
             return RedirectToAction("Index");
         }
+
         public IActionResult Index()
         {
             var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart") ??
@@ -91,22 +111,43 @@ namespace WebBanTrangSuc.Controllers
 
             order.OrderDetails = new List<OrderDetail>(); // Khởi tạo danh sách
 
+            //foreach (var item in cart.Items)
+            //{
+            //    // Trừ số lượng tồn kho
+            //    var product = await _context.Products.FindAsync(item.ProductId);
+            //    if (product != null)
+            //    {
+            //        product.Quantity -= item.Quantity;
+            //    }
+
+            //    order.OrderDetails.Add(new OrderDetail
+            //    {
+            //        ProductId = item.ProductId,
+            //        Quantity = item.Quantity,
+            //        Price = item.Price
+            //    });
+            //}
             foreach (var item in cart.Items)
             {
-                // Trừ số lượng tồn kho
+                // Trừ số lượng tồn kho và cộng QuantitySold
                 var product = await _context.Products.FindAsync(item.ProductId);
                 if (product != null)
                 {
                     product.Quantity -= item.Quantity;
+
+                    // ✅ Cập nhật số lượng đã bán
+                    product.QuantitySold += item.Quantity;
                 }
 
                 order.OrderDetails.Add(new OrderDetail
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    Price = item.Price
+                    Price = item.Price,
+                    Size = item.Size // 🟢 nếu bạn truyền size trong CartItem
                 });
             }
+
 
             // ✅ Save đơn hàng
             _context.Orders.Add(order);
