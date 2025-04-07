@@ -126,22 +126,6 @@
             @Html.DropDownListFor(m => m.SubCategoryId, (SelectList)ViewBag.SubCategories, "Chọn loại", new { @class = "form-control", @id = "SubCategoryId" })
         </div>
 
-        @if (ViewBag.CategoryName?.ToLower() == "nhẫn")
-        {
-            <h5 class="fw-bold">Thêm tồn kho cho từng size</h5>
-            <div class="row">
-                @for (int i = 0; i < 3; i++)
-                {
-                    var size = i == 0 ? 45 : i == 1 ? 48 : 50;
-                    <div class="col-md-4 mb-3">
-                        <label>Size @size:</label>
-                        <input type="hidden" name="Variants[@i].Size" value="@size" />
-                        <input type="number" name="Variants[@i].Stock" class="form-control" min="0" />
-                    </div>
-                }
-            </div>
-        }
-
         <div class="form-group">
             <label asp-for="ImageUrl">Ảnh đại diện</label>
             <input type="file" name="imageUrl" class="form-control" />
