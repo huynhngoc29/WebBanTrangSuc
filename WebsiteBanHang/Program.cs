@@ -1,8 +1,4 @@
 
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.EntityFrameworkCore;
-//using WebBanTrangSuc.Models;
-//using WebBanTrangSuc.Repositories;
 
 //var builder = WebApplication.CreateBuilder(args);
 
