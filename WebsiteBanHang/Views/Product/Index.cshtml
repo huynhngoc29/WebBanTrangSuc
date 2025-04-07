@@ -1,6 +1,9 @@
-﻿@model IEnumerable<WebBanTrangSuc.Models.Product>
+﻿@model IPagedList<WebBanTrangSuc.Models.Product>
 @using Microsoft.AspNetCore.Identity
+@using X.PagedList
+@using X.PagedList.Mvc.Core
 @inject UserManager<ApplicationUser> userManager
+
 
 @{
     var currentUser = await userManager.GetUserAsync(User);
@@ -141,6 +144,26 @@
         @* <!-- Nút search --> *@
         @* <button type="submit" class="btn btn-search">🔍 Search</button> *@
     </form>
+    <!-- Sắp xếp -->
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <label class="fw-bold me-2">Sắp xếp theo:</label>
+
+        <a class="btn btn-outline-secondary @(ViewBag.SortBy == null ? "active" : "")" href="@Url.Action("Index", new { searchTerm = ViewBag.SearchTerm, categoryId = ViewBag.SelectedCategory })">Liên Quan</a>
+
+        <a class="btn btn-outline-secondary @(ViewBag.SortBy == "moi-nhat" ? "active" : "")" href="@Url.Action("Index", new { searchTerm = ViewBag.SearchTerm, categoryId = ViewBag.SelectedCategory, sortBy = "moi-nhat" })">Mới Nhất</a>
+
+        <a class="btn btn-outline-secondary @(ViewBag.SortBy == "ban-chay" ? "active" : "")" href="@Url.Action("Index", new { searchTerm = ViewBag.SearchTerm, categoryId = ViewBag.SelectedCategory, sortBy = "ban-chay" })">Bán Chạy</a>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Giá
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="@Url.Action("Index", new { searchTerm = ViewBag.SearchTerm, categoryId = ViewBag.SelectedCategory, sortBy = "gia-thap-den-cao" })">Giá: Thấp đến Cao</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("Index", new { searchTerm = ViewBag.SearchTerm, categoryId = ViewBag.SelectedCategory, sortBy = "gia-cao-den-thap" })">Giá: Cao đến Thấp</a></li>
+            </ul>
+        </div>
+    </div>
 
     <!-- Danh sách sản phẩm dạng GRID -->
     <section>
@@ -148,38 +171,41 @@
             @foreach (var product in Model)
             {
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card product-card h-100 shadow-sm">
-                        <!-- Hình ảnh sản phẩm -->
-                        <div class="position-relative overflow-hidden">
-                            <img src="@product.ImageUrl" class="card-img-top product-img"
-                                 alt="Product Image">
-                        </div>
+                    <a asp-action="Display" asp-route-id="@product.Id" style="text-decoration: none; color: inherit;">
+                        <div class="card product-card h-100 shadow-sm">
+                            <!-- Hình ảnh sản phẩm -->
+                            <div class="position-relative overflow-hidden">
+                                <img src="@product.ImageUrl" class="card-img-top product-img" alt="Product Image" />
+                            </div>
 
-                        <!-- Nội dung sản phẩm -->
-                        <div class="card-body text-center">
-                            <h5 class="card-title">@product.Name</h5>
-                            <p class="text-primary fw-bold">@product.Price.ToString("N0") VND</p>
-                            <p class="card-text text-muted">@product.Description</p>
+                            <!-- Nội dung sản phẩm -->
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-truncate">@product.Name</h5>
+                                <p class="text-primary fw-bold">@product.Price.ToString("N0") VND</p>
+                                <p class="card-text text-muted text-truncate">@product.Description</p>
+                            </div>
                         </div>
-
-                        <!-- Nút Action: Chỉ hiển thị cho Admin -->
-                        <div class="card-footer text-center">
-                            <a asp-action="Display" asp-route-id="@product.Id" class="btn btn-outline-secondary btn-sm">Xem</a>
-                            <a asp-controller="ShoppingCart" asp-action="AddToCart" asp-route-productId="@product.Id" asp-route-quantity="@numOfQuality">
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="bi-cart-fill me-1"></i> Mua Ngay
-                                </button>
-                            </a>
-                            @if (currentUser != null && User.IsInRole("Admin"))
-                            {
-                                <a asp-action="Update" asp-route-id="@product.Id" class="btn btn-outline-warning btn-sm">Chỉnh sửa</a>
-                                <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-outline-danger btn-sm">Xóa</a>
-                            }
-                        </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>
+
+        <!-- PHÂN TRANG -->
+        <div class="d-flex justify-content-center mt-4">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new
+                {
+                    page,
+                    searchTerm = ViewBag.SearchTerm,
+                    categoryId = ViewBag.SelectedCategory
+                }),
+                     new PagedListRenderOptions
+            {
+                UlElementClasses = new[] { "pagination" },
+                LiElementClasses = new[] { "page-item" },
+                PageClasses = new[] { "page-link" }
+            })
+        </div>
+
     </section>
 </div>
 

@@ -1,80 +1,174 @@
 ﻿@model WebBanTrangSuc.Models.Product
+@using Microsoft.AspNetCore.Mvc.Rendering
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-    ViewData["Title"] = "Thêm sản phẩm";
-    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Add Product";
 }
 
-<!-- Bootstrap & Google Fonts -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<!-- Tùy chỉnh CSS -->
 <style>
     body {
         font-family: 'Poppins', sans-serif;
         background-color: #f8f9fa;
     }
 
-    .container {
-        max-width: 1200px;
+    .pb-3 {
+        max-width: 700px;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
-    .btn-action {
-        font-size: 14px;
-        padding: 5px 10px;
-        margin: 2px;
+    h2 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #ee4d2d;
+        text-align: center;
+        margin-bottom: 30px;
     }
 
-    .form-group {
-        margin-bottom: 1.5rem;
+    .form-group label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 8px;
     }
 
     .form-control {
-        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        padding: 12px;
+        font-size: 16px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+    }
+
+        .form-control:focus {
+            border-color: #ee4d2d;
+            outline: none;
+            box-shadow: 0 0 5px rgba(238, 77, 45, 0.5);
+        }
+
+    .form-group img {
+        margin-top: 10px;
+        max-width: 200px;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    input[type="file"] {
+        margin-top: 10px;
+        padding: 12px;
+        font-size: 14px;
+        width: 100%;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+    }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #ee4d2d;
+        }
+
+    #previewImage {
+        margin-top: 20px;
+        max-width: 200px;
+        height: auto;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 5px;
     }
 </style>
 
-<div class="container mt-4">
-    <h2>➕ Thêm sản phẩm mới</h2>
+<div class="pb-3">
+    <h2>Add Product</h2>
+
     <form asp-action="Add" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+
         <div class="form-group">
-            <label for="Name">Tên sản phẩm</label>
-            <input type="text" class="form-control" id="Name" name="Name" required />
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label for="Price">Giá</label>
-            <input type="number" class="form-control" id="Price" name="Price" required />
+            <label asp-for="Price"></label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label for="Description">Mô tả</label>
-            <textarea class="form-control" id="Description" name="Description"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="Quantity">Số lượng</label>
-            <input asp-for="Quantity" class="form-control" min="0" />
+            <label asp-for="Quantity">Số lượng</label>
+            <input asp-for="Quantity" class="form-control" />
             <span asp-validation-for="Quantity" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label for="CategoryId">Danh mục</label>
-            <select class="form-control" id="CategoryId" name="CategoryId">
-                @foreach (var category in ViewBag.Categories as SelectList)
-                {
-                    <option value="@category.Value">@category.Text</option>
-                }
-            </select>
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="form-group">
-            <label for="ImageUrl">Hình ảnh sản phẩm</label>
-            <input type="file" class="form-control" id="ImageUrl" name="imageUrl" />
+            <label for="CategoryId">Danh mục</label>
+            @Html.DropDownListFor(m => m.CategoryId, (SelectList)ViewBag.Categories, "Chọn danh mục", new { @class = "form-control", @id = "CategoryId" })
         </div>
 
-        <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
-    </form>
+        <div class="form-group">
+            <label for="SubCategoryId">Loại sản phẩm con</label>
+            @Html.DropDownListFor(m => m.SubCategoryId, (SelectList)ViewBag.SubCategories, "Chọn loại", new { @class = "form-control", @id = "SubCategoryId" })
+        </div>
 
+
+
+        @if (ViewBag.CategoryName?.ToLower() == "nhẫn")
+        {
+            <h5 class="fw-bold">Thêm tồn kho cho từng size</h5>
+            <div class="row">
+                @for (int i = 0; i < 3; i++)
+                {
+                    var size = i == 0 ? 45 : i == 1 ? 48 : 50;
+                    <div class="col-md-4 mb-3">
+                        <label>Size @size:</label>
+                        <input type="hidden" name="Variants[@i].Size" value="@size" />
+                        <input type="number" name="Variants[@i].Stock" class="form-control" min="0" />
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="form-group">
+            <label asp-for="ImageUrl">Ảnh đại diện</label>
+            <input type="file" name="imageUrl" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 Lưu</button>
+        <a href="@Url.Action("Product", "Admin", new { area = "Admin" })" class="btn btn-secondary">❌ Hủy</a>
+    </form>
 </div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#CategoryId').change(function () {
+                var categoryId = $(this).val();
+                $.get('/Product/GetSubCategoriesByCategory?categoryId=' + categoryId, function (data) {
+                    var subSelect = $('#SubCategoryId');
+                    subSelect.empty();
+                    $.each(data, function (i, item) {
+                        subSelect.append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }));
+                    });
+                });
+            });
+        });
+    </script>
+}

@@ -20,5 +20,10 @@ namespace WebBanTrangSuc.Models
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<SubCategory> SubCategories { get; set; }
+        public DbSet<CategorySubCategory> CategorySubCategories { get; set; }
+
+
     }
 }

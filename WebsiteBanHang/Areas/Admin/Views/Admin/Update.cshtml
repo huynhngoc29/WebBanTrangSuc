@@ -6,19 +6,15 @@
     ViewData["Title"] = "Edit Product";
 }
 
-<!-- Bootstrap & Google Fonts -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<!-- Tùy chỉnh CSS -->
 <style>
-    /* Tùy chỉnh font chữ */
     body {
         font-family: 'Poppins', sans-serif;
         background-color: #f8f9fa;
     }
 
-    /* Form chỉnh sửa sản phẩm */
     .pb-3 {
         max-width: 700px;
         margin: 50px auto;
@@ -28,7 +24,6 @@
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
-    /* Tiêu đề của form */
     h2 {
         font-size: 28px;
         font-weight: 600;
@@ -37,7 +32,6 @@
         margin-bottom: 30px;
     }
 
-    /* Label cho các trường */
     .form-group label {
         font-size: 16px;
         font-weight: 500;
@@ -45,7 +39,6 @@
         margin-bottom: 8px;
     }
 
-    /* Input và textarea */
     .form-control {
         border-radius: 8px;
         border: 1px solid #ccc;
@@ -56,14 +49,12 @@
         margin-bottom: 20px;
     }
 
-        /* Khi focus vào input */
         .form-control:focus {
             border-color: #ee4d2d;
             outline: none;
             box-shadow: 0 0 5px rgba(238, 77, 45, 0.5);
         }
 
-    /* Hiển thị ảnh sản phẩm */
     .form-group img {
         margin-top: 10px;
         max-width: 200px;
@@ -71,9 +62,6 @@
         border-radius: 8px;
     }
 
-
-
-    /* Style cho file input */
     input[type="file"] {
         margin-top: 10px;
         padding: 12px;
@@ -88,7 +76,6 @@
             border-color: #ee4d2d;
         }
 
-    /* Preview ảnh khi chọn file */
     #previewImage {
         margin-top: 20px;
         max-width: 200px;
@@ -97,13 +84,6 @@
         border: 1px solid #ccc;
         padding: 5px;
     }
-
-    /* Style cho select dropdown */
-    .select2-container .select2-selection--single {
-        height: 40px;
-        border-radius: 8px;
-    }
-
 </style>
 
 <div class="pb-3">
@@ -111,12 +91,12 @@
 
     <form asp-action="Update" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="Id" />
+
         <div class="form-group">
             <label asp-for="Name"></label>
             <input asp-for="Name" class="form-control" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-
 
         <div class="form-group">
             <label asp-for="Price"></label>
@@ -124,40 +104,51 @@
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
 
-
         <div class="form-group">
             <label for="Quantity">Số lượng</label>
             <input asp-for="Quantity" class="form-control" />
             <span asp-validation-for="Quantity" class="text-danger"></span>
         </div>
 
+        @if (Model.CategoryId == 1 && Model.Variants?.Any() == true)
+        {
+            <h5 class="fw-bold mt-4">Cập nhật tồn kho từng size</h5>
+            <div class="row">
+                @for (int i = 0; i < Model.Variants.Count; i++)
+                {
+                    <div class="col-md-4 mb-2">
+                        <label>Size @Model.Variants[i].Size:</label>
+                        <input type="hidden" name="Variants[@i].Id" value="@Model.Variants[i].Id" />
+                        <input type="hidden" name="Variants[@i].Size" value="@Model.Variants[i].Size" />
+                        <input type="number" name="Variants[@i].Stock" value="@Model.Variants[i].Stock" class="form-control" min="0" />
+                    </div>
+                }
+            </div>
+        }
+
         <div class="form-group">
             <label asp-for="Description"></label>
-<textarea asp-for="Description" class="form-control"></textarea>
-            <span asp-validation-for="Description" class="text
-danger"></span>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        
         <div class="form-group">
             <label asp-for="CategoryId">Category</label>
-            <select asp-for="CategoryId" asp-items="@ViewBag.Categories"
-                    class="form-control"></select>
+            <select asp-for="CategoryId" asp-items="@ViewBag.Categories" class="form-control"></select>
         </div>
+
         <div class="form-group">
             <label asp-for="ImageUrl">Product Image</label>
             <input type="file" asp-for="ImageUrl" class="form-control" />
-            <img src="@Model.ImageUrl" alt="Product Image" style="max-width:
-200px;" />
+            <img src="@Model.ImageUrl" alt="Product Image" style="max-width: 200px;" />
         </div>
+
         <div class="col-8">
             <img src="@Model.ImageUrl" alt="Product Image" style="max-width:200px;" id="previewImage" />
-         </div>
+        </div>
 
         <button type="submit" class="btn btn-primary" style="margin-left: 80px; margin-top: 20px; height: 40px">💾 Update</button>
         <a href="@Url.Action("Product", "Admin", new { area = "Admin" })" class="btn btn-secondary" style="margin-left: 250px;margin-top: 20px; height: 40px">❌ Cancel</a>
-      
-
     </form>
 
     <script>
@@ -176,4 +167,3 @@ danger"></span>
         });
     </script>
 </div>
-

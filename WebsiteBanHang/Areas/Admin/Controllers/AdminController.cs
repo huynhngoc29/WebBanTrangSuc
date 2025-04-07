@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebBanTrangSuc.Areas.Admin.Controllers
 {
@@ -18,11 +19,16 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ApplicationDbContext _context;
+        private readonly ISubCategoryRepository _subCategoryRepository;
 
-        public AdminController(IProductRepository productRepository, ICategoryRepository categoryRepository)
+
+        public AdminController(IProductRepository productRepository,
+       ICategoryRepository categoryRepository, ApplicationDbContext context, ISubCategoryRepository subCategoryRepository) // 👉 thêm vào đây
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _subCategoryRepository = subCategoryRepository; // 👉 gán vào đây
         }
 
         // Route cho trang chủ
@@ -94,18 +100,60 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         // Đảm bảo danh mục được truyền qua ViewBag như sau
         [Route("Product/Add")]
+        //public async Task<IActionResult> Add()
+        //{
+        //    var categories = await _categoryRepository.GetAllAsync();
+        //    var subCategories = await _subCategoryRepository.GetAllAsync();
+        //    var validCategories = categories.Where(c => c.Name != null).ToList(); // Lọc bỏ danh mục NULL
+        //    ViewBag.Categories = new SelectList(validCategories, "Id", "Name");
+        //    ViewBag.SubCategories = new SelectList(subCategories, "Id", "Name");// Chuyển danh sách sang SelectList
+
+        //    return View();
+        //}
         public async Task<IActionResult> Add()
         {
             var categories = await _categoryRepository.GetAllAsync();
-            var validCategories = categories.Where(c => c.Name != null).ToList(); // Lọc bỏ danh mục NULL
-            ViewBag.Categories = new SelectList(validCategories, "Id", "Name"); // Chuyển danh sách sang SelectList
+            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+
+            // Load tất cả SubCategory ban đầu hoặc để trống
+            ViewBag.SubCategories = new SelectList(new List<SubCategory>(), "Id", "Name");
 
             return View();
         }
 
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [Route("Product/Add")]
+        //public async Task<IActionResult> Add(Product product, IFormFile imageUrl)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        if (imageUrl != null)
+        //        {
+        //            product.ImageUrl = await SaveImage(imageUrl);
+        //        }
+
+        //        await _productRepository.AddAsync(product);
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    // Nếu không thành công, hiển thị lại form với thông tin đã nhập
+        //    var categories = await _categoryRepository.GetAllAsync();
+        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
+        //    return View(product);
+        //}
+        public async Task<IActionResult> GetSubCategoriesByCategory(int categoryId)
+        {
+            var subCategories = await _context.CategorySubCategories
+                .Where(cs => cs.CategoryId == categoryId)
+                .Include(cs => cs.SubCategory)
+                .Select(cs => cs.SubCategory!)
+                .ToListAsync();
+
+            return Json(new SelectList(subCategories, "Id", "Name"));
+        }
+
         public async Task<IActionResult> Add(Product product, IFormFile imageUrl)
         {
             if (ModelState.IsValid)
@@ -114,14 +162,31 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 {
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
+                var isValidSubCategory = await _context.CategorySubCategories
+    .AnyAsync(cs => cs.CategoryId == product.CategoryId && cs.SubCategoryId == product.SubCategoryId);
 
-                await _productRepository.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+                if (!isValidSubCategory)
+                {
+                    ModelState.AddModelError("SubCategoryId", "Loại sản phẩm không hợp lệ với danh mục đã chọn.");
+                }
+
+                else
+                {
+                    await _productRepository.AddAsync(product);
+                    return RedirectToAction("Product", "Admin", new { area = "Admin" });
+                }
             }
 
-            // Nếu không thành công, hiển thị lại form với thông tin đã nhập
             var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+
+            var subCategoryList = await _context.CategorySubCategories
+                .Where(cs => cs.CategoryId == product.CategoryId)
+                .Include(cs => cs.SubCategory)
+                .Select(cs => cs.SubCategory!)
+                .ToListAsync();
+            ViewBag.SubCategories = new SelectList(subCategoryList, "Id", "Name", product.SubCategoryId);
+
             return View(product);
         }
 
@@ -148,19 +213,14 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
         }
         [Authorize(Roles = "Admin")]
         [Route("Product/Update/{id}")]
+
+        // Hiển thị form cập nhật sản phẩm
         public async Task<IActionResult> Update(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var product = await _productRepository.GetByIdWithCategoryAndVariantsAsync(id); // ✅ cần include Variants
             if (product == null)
             {
                 return NotFound();
-            }
-
-            var categoryExists = await _categoryRepository.GetByIdAsync(product.CategoryId);
-            if (categoryExists == null)
-            {
-                ModelState.AddModelError("CategoryId", "Danh mục không tồn tại.");
-                return View(product);
             }
 
             var categories = await _categoryRepository.GetAllAsync();
@@ -171,10 +231,95 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
 
 
         // Xử lý cập nhật sản phẩm
+        //[HttpPost]
+
+        //public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
+        //{
+        //    ModelState.Remove("ImageUrl"); // Loại bỏ xác thực ModelState cho trường ImageUrl
+
+        //    if (id != product.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        var existingProduct = await _productRepository.GetByIdAsync(id); // Lấy sản phẩm hiện tại từ DB
+
+        //        // Kiểm tra nếu không có ảnh mới, giữ nguyên ảnh cũ
+        //        if (imageUrl == null)
+        //        {
+        //            product.ImageUrl = existingProduct.ImageUrl;
+        //        }
+        //        else
+        //        {
+        //            // Lưu ảnh mới nếu có
+        //            product.ImageUrl = await SaveImage(imageUrl);
+        //        }
+
+        //        existingProduct.Name = product.Name;
+        //        existingProduct.Price = product.Price;
+        //        existingProduct.Description = product.Description;
+        //        existingProduct.Quantity = product.Quantity;
+        //        existingProduct.CategoryId = product.CategoryId;
+        //        existingProduct.ImageUrl = product.ImageUrl;
+
+        //        await _productRepository.UpdateAsync(existingProduct);
+        //        return RedirectToAction("Product", "Admin", new { area = "Admin" }); // Quay lại danh sách sản phẩm
+        //    }
+
+        //    // Nếu ModelState không hợp lệ, hiển thị lại form và các danh mục
+        //    var categories = await _categoryRepository.GetAllAsync();
+        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
+        //    return View(product);
+        //}
+        
+
+
+
+        // Xử lý cập nhật sản phẩm
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [Route("Product/Update/{id}")]
 
+        //public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
+        //{
+        //    ModelState.Remove("ImageUrl");
+
+        //    if (id != product.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        var existingProduct = await _productRepository.GetByIdAsync(id);
+
+        //        if (imageUrl == null)
+        //        {
+        //            product.ImageUrl = existingProduct.ImageUrl;
+        //        }
+        //        else
+        //        {
+        //            product.ImageUrl = await SaveImage(imageUrl);
+        //        }
+
+        //        existingProduct.Name = product.Name;
+        //        existingProduct.Price = product.Price;
+        //        existingProduct.Description = product.Description;
+        //        existingProduct.Quantity = product.Quantity;
+        //        existingProduct.CategoryId = product.CategoryId;
+        //        existingProduct.ImageUrl = product.ImageUrl;
+
+        //        await _productRepository.UpdateAsync(existingProduct);
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    var categories = await _categoryRepository.GetAllAsync();
+        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
+        //    return View(product);
+        //}
+       
         public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
         {
             ModelState.Remove("ImageUrl");
@@ -186,8 +331,13 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var existingProduct = await _productRepository.GetByIdAsync(id);
+                var existingProduct = await _productRepository.GetByIdWithCategoryAndVariantsAsync(id);
+                if (existingProduct == null)
+                {
+                    return NotFound();
+                }
 
+                // Ảnh mới hay giữ nguyên
                 if (imageUrl == null)
                 {
                     product.ImageUrl = existingProduct.ImageUrl;
@@ -197,6 +347,7 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
 
+                // Cập nhật thông tin sản phẩm
                 existingProduct.Name = product.Name;
                 existingProduct.Price = product.Price;
                 existingProduct.Description = product.Description;
@@ -205,7 +356,23 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 existingProduct.ImageUrl = product.ImageUrl;
 
                 await _productRepository.UpdateAsync(existingProduct);
-                return RedirectToAction(nameof(Index));
+
+                // ✅ Nếu là nhẫn => cập nhật từng size
+                if (product.CategoryId == 1 && product.Variants != null) // 1 là CategoryId của "Nhẫn"
+                {
+                    foreach (var variant in product.Variants)
+                    {
+                        var existingVariant = await _context.ProductVariants.FindAsync(variant.Id);
+                        if (existingVariant != null)
+                        {
+                            existingVariant.Stock = variant.Stock;
+                            _context.ProductVariants.Update(existingVariant);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
+                return RedirectToAction("Product", "Admin", new { area = "Admin" });
             }
 
             var categories = await _categoryRepository.GetAllAsync();

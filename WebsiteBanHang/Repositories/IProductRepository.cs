@@ -15,6 +15,9 @@ namespace WebBanTrangSuc.Repositories
         Task UpdateAsync(Product product);
         Task DeleteAsync(int id);
         Task<IEnumerable<Product>> GetFlashSaleProductsAsync();
+        Task<Product?> GetByIdWithCategoryAndVariantsAsync(int id);
+        Task<Product?> GetByIdWithVariantsAsync(int id);
+        
 
     }
 }

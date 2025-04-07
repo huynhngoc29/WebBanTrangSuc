@@ -28,5 +28,10 @@ namespace WebBanTrangSuc.Models
         public bool IsOnSale { get; set; } = false;  // Không giảm giá
 
         public int Quantity { get; set; } = 0;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public int QuantitySold { get; set; } //số lượng đã bán
+        public List<ProductVariant>? Variants { get; set; } // Liên kết ngược
+
+
     }
 }

@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using WebBanTrangSuc.Areas.Admin.Models;
 using WebBanTrangSuc.Models;
 using WebBanTrangSuc.Repositories;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace WebBanTrangSuc.Controllers
 {
@@ -14,11 +16,13 @@ namespace WebBanTrangSuc.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly ApplicationDbContext _context;
         public ProductController(IProductRepository productRepository,
-        ICategoryRepository categoryRepository)
+        ICategoryRepository categoryRepository, ApplicationDbContext context)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _context = context;
         }
         // Hiển thị danh sách sản phẩm
         public async Task<IActionResult> Index()
@@ -47,6 +51,24 @@ namespace WebBanTrangSuc.Controllers
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
                 await _productRepository.AddAsync(product);
+                // Tự tạo variant nếu là nhẫn
+                var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
+                if (category != null && category.Name.ToLower() == "nhẫn")
+                {
+                    var defaultSizes = new List<string> { "45", "48", "50", "52", "55" };
+
+                    foreach (var size in defaultSizes)
+                    {
+                        _context.ProductVariants.Add(new ProductVariant
+                        {
+                            ProductId = product.Id,
+                            Size = size,
+                            Stock = 0
+                        });
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction("Product", "Admin", new { area = "Admin" }); // Sau khi thêm thành công, chuyển hướng về trang danh sách sản phẩm
             }
             // Nếu ModelState không hợp lệ, hiển thị form với dữ liệu đã nhập
@@ -66,52 +88,68 @@ namespace WebBanTrangSuc.Controllers
             return "/images/" + image.FileName; // Trả về đường dẫn tương đối
         }
         //Nhớ tạo folder images trong wwwroot
+        //public async Task<IActionResult> Display(int id)
+        //{
+        //    var product = await _productRepository.GetByIdAsync(id);
+        //    if (product == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    // Lấy tất cả sản phẩm và lọc sản phẩm tương tự theo CategoryId
+        //    var allProducts = await _productRepository.GetAllAsync(); // Lấy tất cả sản phẩm
+        //    var similarProducts = allProducts
+        //        .Where(p => p.CategoryId == product.CategoryId && p.Id != product.Id)
+        //        .Take(4) // Lấy tối đa 4 sản phẩm tương tự
+        //        .ToList();
+
+        //    // Truyền dữ liệu vào View
+        //    ViewBag.SimilarProducts = similarProducts;
+        //    return View(product);
+        //}
+
         public async Task<IActionResult> Display(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            // Gọi phương thức mới để lấy sản phẩm kèm Category & Variants
+            var product = await _productRepository.GetByIdWithCategoryAndVariantsAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            // Lấy tất cả sản phẩm và lọc sản phẩm tương tự theo CategoryId
-            var allProducts = await _productRepository.GetAllAsync(); // Lấy tất cả sản phẩm
+            // Lấy các sản phẩm tương tự (cùng Category, khác ID hiện tại)
+            var allProducts = await _productRepository.GetAllAsync();
             var similarProducts = allProducts
                 .Where(p => p.CategoryId == product.CategoryId && p.Id != product.Id)
-                .Take(4) // Lấy tối đa 4 sản phẩm tương tự
+                .Take(4)
                 .ToList();
 
-            // Truyền dữ liệu vào View
             ViewBag.SimilarProducts = similarProducts;
+
             return View(product);
         }
+
         // Hiển thị form cập nhật sản phẩm
         [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Update(int id)
         {
-            // Lấy sản phẩm theo id
-            var product = await _productRepository.GetByIdAsync(id);
+            // Lấy sản phẩm kèm Variants và Category
+            var product = await _productRepository.GetByIdWithCategoryAndVariantsAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            // Kiểm tra sự tồn tại của CategoryId trong bảng Categories
-            var categoryExists = await _categoryRepository.GetByIdAsync(product.CategoryId);
-            if (categoryExists == null)
-            {
-                ModelState.AddModelError("CategoryId", "Danh mục không tồn tại.");
-                return View(product); // Trả lại view nếu không tìm thấy danh mục
-            }
-
-            // Lấy tất cả danh mục và truyền vào ViewBag
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-            return View(product); // Trả lại view khi thông tin hợp lệ
+
+            return View(product);
         }
+
 
         // Xử lý cập nhật sản phẩm
         [HttpPost]
+
         public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
         {
             ModelState.Remove("ImageUrl"); // Loại bỏ xác thực ModelState cho trường ImageUrl
@@ -175,79 +213,82 @@ namespace WebBanTrangSuc.Controllers
         }
 
         [HttpGet]
-        //public async Task<IActionResult> Index(string searchTerm, int? categoryId)
+
+        //public async Task<IActionResult> Index(string searchTerm, int? categoryId, int page = 1, int pageSize = 12)
         //{
         //    var products = await _productRepository.GetAllAsync();
 
-        //    // Lọc theo tên sản phẩm
+        //    // Lọc theo tên
         //    if (!string.IsNullOrEmpty(searchTerm))
         //    {
-        //        products = products.Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        //        products = products
+        //            .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+        //            .ToList();
         //    }
 
-        //    // Lọc theo hãng (Category)
+        //    // Lọc theo danh mục
         //    if (categoryId.HasValue && categoryId > 0)
         //    {
         //        products = products.Where(p => p.CategoryId == categoryId).ToList();
         //    }
 
+        //    // 👉 Sắp xếp theo ngày tạo mới nhất
+        //    products = products.OrderByDescending(p => p.CreatedAt).ToList();
 
-        //    // Lấy danh sách hãng (Category) từ CSDL
-        //    var categories = await _categoryRepository.GetAllAsync();
-        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
+        //    // Truyền dữ liệu phân trang
+        //    var pagedProducts = products.ToPagedList(page, pageSize);
 
-        //    // Truyền dữ liệu vào ViewBag để hiển thị lại trên giao diện
-        //    ViewBag.SelectedCategory = categoryId;
         //    ViewBag.SearchTerm = searchTerm;
-
-        //    return View(products);
-        //}
-
-        //public async Task<IActionResult> Index(string searchTerm, int? categoryId, int? subCategoryId)
-        //{
-        //    var products = await _productRepository.GetAllAsync();
-
-        //    if (categoryId.HasValue)
-        //    {
-        //        products = products.Where(p => p.CategoryId == categoryId).ToList();
-        //    }
-
-        //    if (subCategoryId.HasValue)
-        //    {
-        //        products = products.Where(p => p.SubCategoryId == subCategoryId).ToList();
-        //    }
-
-        //    var categories = await _categoryRepository.GetAllAsync();
-        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
         //    ViewBag.SelectedCategory = categoryId;
-        //    ViewBag.SelectedSubCategory = subCategoryId;
 
-        //    return View(products);
+        //    return View(pagedProducts);
         //}
-        public async Task<IActionResult> Index(string searchTerm, int? categoryId, int? subCategoryId)
+        public async Task<IActionResult> Index(string searchTerm, int? categoryId, string sortBy, int page = 1, int pageSize = 12)
         {
             var products = await _productRepository.GetAllAsync();
 
-            // ✅ Lọc theo từ khóa tìm kiếm
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                products = products.Where(p => !string.IsNullOrEmpty(p.Name) &&
-                                               p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+                products = products
+                    .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
 
-            if (categoryId.HasValue)
+            if (categoryId.HasValue && categoryId > 0)
+            {
                 products = products.Where(p => p.CategoryId == categoryId).ToList();
+            }
 
-            if (subCategoryId.HasValue)
-                products = products.Where(p => p.SubCategoryId == subCategoryId).ToList();
+            // 👉 Xử lý sắp xếp
+            switch (sortBy)
+            {
+                case "moi-nhat":
+                    products = products.OrderByDescending(p => p.CreatedAt).ToList();
+                    break;
+                case "gia-thap-den-cao":
+                    products = products.OrderBy(p => p.Price).ToList();
+                    break;
+                case "gia-cao-den-thap":
+                    products = products.OrderByDescending(p => p.Price).ToList();
+                    break;
+                case "ban-chay":
+                    products = products.OrderByDescending(p => p.QuantitySold).ToList(); // cần field QuantitySold
+                    break;
+                default:
+                    break; // liên quan mặc định
+            }
 
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            var pagedProducts = products.ToPagedList(page, pageSize);
 
-            ViewBag.SearchTerm = searchTerm; // ✅ giữ lại từ khóa
+            // Truyền dữ liệu sang view
+            ViewBag.SearchTerm = searchTerm;
+            ViewBag.SelectedCategory = categoryId;
+            ViewBag.SortBy = sortBy;
 
-            return View(products);
+            return View(pagedProducts);
         }
+
+
 
 
 
@@ -261,18 +302,21 @@ namespace WebBanTrangSuc.Controllers
 
             return View(flashSaleProducts);
         }
-        public async Task<IActionResult> NewProducts()
-        {
-            var products = await _productRepository.GetAllAsync();
+       
 
-            // Giả sử bạn sắp xếp theo thời gian tạo mới nhất nếu có
+        public async Task<IActionResult> NewProducts(int? page)
+        {
+            var pageNumber = page ?? 1;
+            var pageSize = 8;
+
+            var products = await _productRepository.GetAllAsync();
             var newProducts = products
-                .OrderByDescending(p => p.Id) // hoặc p.CreatedAt nếu có field thời gian
-                .Take(100) // tùy theo giới hạn bạn muốn
-                .ToList();
+                .OrderByDescending(p => p.CreatedAt)
+                .ToPagedList(pageNumber, pageSize);
 
             return View(newProducts);
         }
+
 
 
     }
