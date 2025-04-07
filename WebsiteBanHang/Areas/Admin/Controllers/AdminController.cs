@@ -230,99 +230,13 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
 
 
 
-        // Xử lý cập nhật sản phẩm
-        //[HttpPost]
-
-        //public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
-        //{
-        //    ModelState.Remove("ImageUrl"); // Loại bỏ xác thực ModelState cho trường ImageUrl
-
-        //    if (id != product.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        var existingProduct = await _productRepository.GetByIdAsync(id); // Lấy sản phẩm hiện tại từ DB
-
-        //        // Kiểm tra nếu không có ảnh mới, giữ nguyên ảnh cũ
-        //        if (imageUrl == null)
-        //        {
-        //            product.ImageUrl = existingProduct.ImageUrl;
-        //        }
-        //        else
-        //        {
-        //            // Lưu ảnh mới nếu có
-        //            product.ImageUrl = await SaveImage(imageUrl);
-        //        }
-
-        //        existingProduct.Name = product.Name;
-        //        existingProduct.Price = product.Price;
-        //        existingProduct.Description = product.Description;
-        //        existingProduct.Quantity = product.Quantity;
-        //        existingProduct.CategoryId = product.CategoryId;
-        //        existingProduct.ImageUrl = product.ImageUrl;
-
-        //        await _productRepository.UpdateAsync(existingProduct);
-        //        return RedirectToAction("Product", "Admin", new { area = "Admin" }); // Quay lại danh sách sản phẩm
-        //    }
-
-        //    // Nếu ModelState không hợp lệ, hiển thị lại form và các danh mục
-        //    var categories = await _categoryRepository.GetAllAsync();
-        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
-        //    return View(product);
-        //}
-        
-
-
-
-        // Xử lý cập nhật sản phẩm
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [Route("Product/Update/{id}")]
 
-        //public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
-        //{
-        //    ModelState.Remove("ImageUrl");
-
-        //    if (id != product.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        var existingProduct = await _productRepository.GetByIdAsync(id);
-
-        //        if (imageUrl == null)
-        //        {
-        //            product.ImageUrl = existingProduct.ImageUrl;
-        //        }
-        //        else
-        //        {
-        //            product.ImageUrl = await SaveImage(imageUrl);
-        //        }
-
-        //        existingProduct.Name = product.Name;
-        //        existingProduct.Price = product.Price;
-        //        existingProduct.Description = product.Description;
-        //        existingProduct.Quantity = product.Quantity;
-        //        existingProduct.CategoryId = product.CategoryId;
-        //        existingProduct.ImageUrl = product.ImageUrl;
-
-        //        await _productRepository.UpdateAsync(existingProduct);
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    var categories = await _categoryRepository.GetAllAsync();
-        //    ViewBag.Categories = new SelectList(categories, "Id", "Name");
-        //    return View(product);
-        //}
-       
         public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
         {
-            ModelState.Remove("ImageUrl");
+            ModelState.Remove("ImageUrl"); // Loại bỏ xác thực ModelState cho trường ImageUrl
 
             if (id != product.Id)
             {
@@ -331,23 +245,19 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var existingProduct = await _productRepository.GetByIdWithCategoryAndVariantsAsync(id);
-                if (existingProduct == null)
-                {
-                    return NotFound();
-                }
+                var existingProduct = await _productRepository.GetByIdAsync(id); // Lấy sản phẩm hiện tại từ DB
 
-                // Ảnh mới hay giữ nguyên
+                // Kiểm tra nếu không có ảnh mới, giữ nguyên ảnh cũ
                 if (imageUrl == null)
                 {
                     product.ImageUrl = existingProduct.ImageUrl;
                 }
                 else
                 {
+                    // Lưu ảnh mới nếu có
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
 
-                // Cập nhật thông tin sản phẩm
                 existingProduct.Name = product.Name;
                 existingProduct.Price = product.Price;
                 existingProduct.Description = product.Description;
@@ -356,55 +266,18 @@ namespace WebBanTrangSuc.Areas.Admin.Controllers
                 existingProduct.ImageUrl = product.ImageUrl;
 
                 await _productRepository.UpdateAsync(existingProduct);
-
-                // ✅ Nếu là nhẫn => cập nhật từng size
-                if (product.CategoryId == 1 && product.Variants != null) // 1 là CategoryId của "Nhẫn"
-                {
-                    foreach (var variant in product.Variants)
-                    {
-                        var existingVariant = await _context.ProductVariants.FindAsync(variant.Id);
-                        if (existingVariant != null)
-                        {
-                            existingVariant.Stock = variant.Stock;
-                            _context.ProductVariants.Update(existingVariant);
-                        }
-                    }
-                    await _context.SaveChangesAsync();
-                }
-
-                return RedirectToAction("Product", "Admin", new { area = "Admin" });
+                return RedirectToAction("Products", "Admin", new { area = "Admin" }); // Quay lại danh sách sản phẩm
             }
 
+            // Nếu ModelState không hợp lệ, hiển thị lại form và các danh mục
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
             return View(product);
         }
 
 
-        //[HttpPost]
-        //[Authorize(Roles = "Admin")]
-        //[Route("Product/Delete/{id}")]
 
-        //public async Task<IActionResult> Delete(int id)
-        //{
-        //    var product = await _productRepository.GetByIdAsync(id);
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(product);
-        //}
-
-        //// Xử lý xóa sản phẩm khi người dùng xác nhận
-        //[Authorize(Roles = "Admin")]
-        //[HttpPost, ActionName("DeleteConfirmed")]
-        //[Route("Product/DeleteConfirmed/{id}")]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    await _productRepository.DeleteAsync(id);
-        //    return RedirectToAction(nameof(Index)); // Quay lại danh sách sản phẩm
-        //}// Action để hiển thị trang xác nhận xóa
-        [HttpGet]
+            [HttpGet]
         [Authorize(Roles = "Admin")]
         [Route("Product/Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
