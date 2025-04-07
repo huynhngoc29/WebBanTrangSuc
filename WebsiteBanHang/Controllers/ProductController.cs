@@ -56,28 +56,15 @@ namespace WebBanTrangSuc.Controllers
 
                 await _productRepository.AddAsync(product);
 
+                // Nếu cần xử lý gì với category trong tương lai, có thể dùng lại biến này
                 var category = await _categoryRepository.GetByIdAsync(product.CategoryId);
-                if (category != null && category.Name.ToLower() == "nhẫn")
-                {
-                    var defaultSizes = new List<string> { "45", "48", "50", "52", "55" };
 
-                    foreach (var size in defaultSizes)
-                    {
-                        _context.ProductVariants.Add(new ProductVariant
-                        {
-                            ProductId = product.Id,
-                            Size = size,
-                            Stock = 0
-                        });
-                    }
-
-                    await _context.SaveChangesAsync();
-                }
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction("Products", "Admin", new { area = "Admin" });
             }
 
-            // Load lại Category + SubCategory khi lỗi
+            // Nếu có lỗi, load lại danh sách Category & SubCategory
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
 
@@ -91,6 +78,7 @@ namespace WebBanTrangSuc.Controllers
 
             return View(product);
         }
+
 
         [Authorize(Roles = SD.Role_Admin)]
         private async Task<string> SaveImage(IFormFile image)
@@ -168,44 +156,47 @@ namespace WebBanTrangSuc.Controllers
         // Xử lý cập nhật sản phẩm
         [HttpPost]
 
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
         {
-            ModelState.Remove("ImageUrl"); // Loại bỏ xác thực ModelState cho trường ImageUrl
+            ModelState.Remove("ImageUrl"); // Tránh lỗi nếu không upload lại ảnh
 
             if (id != product.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                var existingProduct = await _productRepository.GetByIdAsync(id); // Lấy sản phẩm hiện tại từ DB
+                var existingProduct = await _productRepository.GetByIdAsync(id);
+                if (existingProduct == null)
+                    return NotFound();
 
-                // Kiểm tra nếu không có ảnh mới, giữ nguyên ảnh cũ
+                // Giữ lại ảnh cũ nếu không upload ảnh mới
                 if (imageUrl == null)
                 {
                     product.ImageUrl = existingProduct.ImageUrl;
                 }
                 else
                 {
-                    // Lưu ảnh mới nếu có
                     product.ImageUrl = await SaveImage(imageUrl);
                 }
 
+                // Cập nhật các trường
                 existingProduct.Name = product.Name;
                 existingProduct.Price = product.Price;
                 existingProduct.Description = product.Description;
                 existingProduct.Quantity = product.Quantity;
                 existingProduct.CategoryId = product.CategoryId;
+                existingProduct.SubCategoryId = product.SubCategoryId;
                 existingProduct.ImageUrl = product.ImageUrl;
 
                 await _productRepository.UpdateAsync(existingProduct);
-                return RedirectToAction("Products", "Admin", new { area = "Admin" }); // Quay lại danh sách sản phẩm
+                return RedirectToAction("Products", "Admin", new { area = "Admin" });
             }
 
-            // Nếu ModelState không hợp lệ, hiển thị lại form và các danh mục
+            // Nếu ModelState không hợp lệ, load lại dropdown category và subcategory
             var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
 
             var subCategories = await _context.CategorySubCategories
                 .Where(cs => cs.CategoryId == product.CategoryId)
@@ -214,8 +205,10 @@ namespace WebBanTrangSuc.Controllers
                 .ToListAsync();
 
             ViewBag.SubCategories = new SelectList(subCategories, "Id", "Name", product.SubCategoryId);
+
             return View(product);
         }
+
 
 
         // Hiển thị form xác nhận xóa sản phẩm
